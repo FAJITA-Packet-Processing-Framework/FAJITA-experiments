@@ -64,7 +64,7 @@ set ytics offset 0.7,0 nomirror
 set tic scale 0.2
 
 # Y2-axis
-set y2label "LLC Misses per packet" font "Helvetica-Bold,15"
+set y2label "LLC Misses / packet" font "Helvetica-Bold,15"
 set y2label offset -3.7,0
 set y2range [0:7.9]
 set y2tics 2

@@ -63,7 +63,7 @@ set grid ytics lw 3.0 lt 0
 unset key
 
 # Y-axis
-set ylabel "{/Helvetica:Bold Avg. LLC Misses / Packet}"
+set ylabel "{/Helvetica:Bold LLC Misses / Packet}"
 set ylabel offset 1.4,-0.5
 set yrange [y_min:y_max]
 set ytics border in scale 1,0.5 norotate mirror
