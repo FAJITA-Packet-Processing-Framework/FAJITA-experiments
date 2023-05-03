@@ -10,15 +10,15 @@ points_size = 1
 line_width = 1
 
 ### Margins
-bm_bottom = 0.19
+bm_bottom = 0.21
 tm_bottom = 0.98
 lm = 0.12
 rm = 0.99
 
-font_type = "Helvetica,28"
-font_type_bold = "Helvetica-Bold,28"
+font_type = "Helvetica,15"
+font_type_bold = "Helvetica-Bold,15"
 
-set terminal pdf color enhanced font "Helvetica,38" size 10cm,4.5cm;
+set terminal pdf color enhanced font "Helvetica,35" size 10cm,4.5cm;
 set style fill solid 1 border -1 
 set style boxplot nooutliers
 set style boxplot fraction 1.00
@@ -48,16 +48,16 @@ set rmargin at screen rm
 set xtics font "Helvetica, 15" 
 set ytics font "Helvetica, 15"
 # X-axis
-# set xlabel "Table size ratio" font "Helvetica-Bold,15"
+set xlabel "Processing Pipeline" font "Helvetica-Bold,15"
 set xlabel offset 0,1.6
 set xtics offset 0.1,0.7 nomirror
 set xtics border in scale 1,0.5 norotate autojustify mirror
-set xrange [-0.5:2.5]
+set xrange [-0.5:3.5]
 
 # Y-axis
 set ylabel "Throughput (Mpps)" font "Helvetica-Bold,15"
 set ylabel offset 3.5,0
-set yrange [0:92]
+set yrange [0:99]
 set ytic 20
 set ytics offset 0.7,0 nomirror
 set tic scale 0.2
@@ -76,4 +76,5 @@ set style line 4 pointtype 10 pointsize points_size linewidth points_lw linecolo
 #set arrow heads back filled from -0.4,83 to 1.9,83 ls 1 linewidth 1
 #set label '+84%' at 28.5,42 textcolor ls 1
 
-plot baseline_file using 1:3:($3>60 ? 0x78c679 : $3> 40 ? 0X00441b : 0x238b45):xticlabels(2) with boxes ls 1 lc rgb var notitle
+plot baseline_file using 1:3:($3>60 ? 0x78c679 : $3> 40 ? 0X00441b : $3> 15 ? 0x238b45 : 0x66c2a4):xticlabels(2) with boxes ls 1 lc rgb var notitle, \
+"" u 1:3:3 w labels offset 0,0.3 font "Helvetica,15" notitle
