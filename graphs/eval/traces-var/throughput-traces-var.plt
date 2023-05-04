@@ -40,11 +40,12 @@ set border back
 set key box linestyle 1 lt rgb("#000000")
 set key vertical maxrows 2
 set key width 0
-set key height 0.4
+set key height 0.2
 set key samplen 3.0
-set key at 0.587, 69.35
+set key at 0.857, 67.35
 set key font "Helvetica, 15"
 set key invert 
+# set key top left inside
 #set key bottom Left left reverse box width 2
 set xtics font "Helvetica, 15" 
 set ytics font "Helvetica, 15"
@@ -76,5 +77,5 @@ set style line 2 pointtype 4 pointsize points_size linewidth points_lw linecolor
 set style line 3 pointtype 8 pointsize points_size linewidth points_lw linecolor rgb '#66c2a4'
 set style line 4 pointtype 10 pointsize points_size linewidth points_lw linecolor rgb '#78c679'
 
-plot baseline_file using 3:xtic(2) ls 1 title "FastClick", \
+plot baseline_file using 3:xtic(2) ls 1 title "FastClick+BR", \
 ref_file using 3 with histogram ls 4 title "FAJITA"

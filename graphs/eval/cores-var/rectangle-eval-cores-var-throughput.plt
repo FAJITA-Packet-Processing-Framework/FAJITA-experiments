@@ -41,7 +41,7 @@ set key vertical maxrows 2
 set key width 0
 set key height 0.5
 set key samplen 3.0
-set key at 1.4, 72.95
+set key at 1.7, 72.95
 set key font "Helvetica, 15"
 set key invert
 
@@ -49,7 +49,7 @@ set key invert
 set xtics font "Helvetica, 15" 
 set ytics font "Helvetica, 15"
 # X-axis
-set xlabel "Available CPU cores" font "Helvetica-Bold,15"
+set xlabel "Available CPU Cores" font "Helvetica-Bold,15"
 set xlabel offset 0,1.75
 set xtics offset 0,0.7 nomirror
 set xtics border in scale 1,0.5 norotate autojustify mirror
@@ -76,5 +76,5 @@ set style line 2 pointtype 4 pointsize points_size linewidth points_lw linecolor
 set style line 3 pointtype 8 pointsize points_size linewidth points_lw linecolor rgb '#66c2a4'
 set style line 4 pointtype 10 pointsize points_size linewidth points_lw linecolor rgb '#78c679'
 
-plot baseline_file using 5:xtic(1) ls 1 title "FastClick", \
+plot baseline_file using 5:xtic(1) ls 1 title "FastClick+BR", \
 ref_file using 5 with histogram ls 4 title "FAJITA"

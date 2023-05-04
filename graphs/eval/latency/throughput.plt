@@ -80,8 +80,9 @@ set key vertical maxrows 2
 set key width 1
 set key height 0.5
 set key samplen 4.0
-set key at 31,68.3
+# set key at 31,68.3
 # set key invert
+set key top left inside
 set key reverse Left
 
 ### Linestyles
@@ -95,9 +96,13 @@ set style line 4 pointtype 10 pointsize points_size linewidth points_lw linecolo
 # set label '-54%' at 15.16,166 textcolor ls 1
 # set arrow nohead from 1.3,217 to 16.4,217 ls 1 linewidth 3 dt 2
 
+set label '2x' at 84,60 textcolor rgb 'red'
+set arrow heads from 90,42 to 90,79 ls 1 linewidth 3 lc rgb 'red' dt 1
+
+
 plot \
 	input_file_2_ways  using (($1*6)/1000000):($5):($4):($6) with errorbars ls 4 title "FAJITA",\
         input_file_2_ways  using (($1*6)/1000000):($5) with lines ls 4 dt 5 notitle,\
-        input_file_1_way  using (($1*6)/1000000):($5):($4):($6) with errorbars ls 1 title "FastClick",\
+        input_file_1_way  using (($1*6)/1000000):($5):($4):($6) with errorbars ls 1 title "FastClick+BR",\
         input_file_1_way  using (($1*6)/1000000):($5) with lines ls 1 dt 5 notitle
 unset multiplot

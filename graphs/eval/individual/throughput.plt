@@ -57,7 +57,7 @@ set xrange [-0.5:3.5]
 # Y-axis
 set ylabel "Throughput (Mpps)" font "Helvetica-Bold,15"
 set ylabel offset 3.5,0
-set yrange [0:92]
+set yrange [0:99]
 set ytic 20
 set ytics offset 0.7,0 nomirror
 set tic scale 0.2
@@ -73,4 +73,5 @@ set style line 3 pointtype 8 pointsize points_size linewidth points_lw linecolor
 set style line 4 pointtype 10 pointsize points_size linewidth points_lw linecolor rgb '#0868ac'
 
 
-plot baseline_file using 1:3:($3>50 ? 0x78c679 : 0x00441b):xticlabels(2) with boxes ls 3 lc rgb var  notitle
+plot baseline_file using 1:3:($3>50 ? 0x78c679 : $3>30 ? 0x00441b : 0x66c2a4):xticlabels(2) with boxes ls 3 lc rgb var notitle,\
+"" u 1:3:3 w labels offset 0,0.3 font "Helvetica,15" notitle

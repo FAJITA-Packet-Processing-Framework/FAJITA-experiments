@@ -64,7 +64,7 @@ set grid ytics lw 3.0 lt 0
 unset key
 
 # Y-axis
-set ylabel "{/Helvetica:Bold Average Latency (us)}"
+set ylabel "{/Helvetica:Bold Average Latency ({/Symbol m}s)}"
 set ylabel offset 0.8,-0.5
 set yrange [y_min:y_max]
 set ytics border in scale 1,0.5 norotate mirror
@@ -80,7 +80,7 @@ set key vertical maxrows 2
 set key width 1
 set key height 0.5
 set key samplen 4.0
-set key at 33,392.3
+set key at 37,392.3
 set key invert
 set key reverse Left
 
@@ -92,12 +92,16 @@ set style line 4 pointtype 10 pointsize points_size linewidth points_lw linecolo
 
 # Highlight the difference
 # set arrow heads back filled from 16.35,104 to 16.35,216.5 ls 1 linewidth 3
-# set label '-54%' at 15.16,166 textcolor ls 1
-# set arrow nohead from 1.3,217 to 16.4,217 ls 1 linewidth 3 dt 2
+set label '7.7x' at 62,250 textcolor rgb 'red'
+set arrow heads from 60,75 to 60,390 ls 1 linewidth 3 lc rgb 'red' dt 1
+
+set label '2.58x' at 81,350 textcolor rgb 'red'
+set arrow heads from 90,210 to 90,475 ls 1 linewidth 3 lc rgb 'red' dt 1
+
 
 plot \
 	input_file_2_ways  using ($1*6/1000000):($5):($2):($8) with errorbars ls 4 title "FAJITA",\
         input_file_2_ways  using ($1*6/1000000):($5) with lines ls 4 dt 5 notitle,\
-        input_file_1_way  using ($1*6/1000000):($5):($2):($8) with errorbars ls 1 title "FastClick",\
+        input_file_1_way  using ($1*6/1000000):($5):($2):($8) with errorbars ls 1 title "FastClick+BR",\
         input_file_1_way  using ($1*6/1000000):($5) with lines ls 1 dt 5 notitle
 unset multiplot
