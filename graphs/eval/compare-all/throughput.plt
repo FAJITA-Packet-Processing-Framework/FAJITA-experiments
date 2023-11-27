@@ -52,7 +52,7 @@ set xlabel "Processing Pipeline" font "Helvetica-Bold,15"
 set xlabel offset 0,1.6
 set xtics offset 0.1,0.7 nomirror
 set xtics border in scale 1,0.5 norotate autojustify mirror
-set xrange [-0.5:3.5]
+set xrange [-0.5:4.5]
 
 # Y-axis
 set ylabel "Throughput (Mpps)" font "Helvetica-Bold,15"
@@ -76,5 +76,5 @@ set style line 4 pointtype 10 pointsize points_size linewidth points_lw linecolo
 #set arrow heads back filled from -0.4,83 to 1.9,83 ls 1 linewidth 1
 #set label '+84%' at 28.5,42 textcolor ls 1
 
-plot baseline_file using 1:3:($3>60 ? 0x78c679 : $3> 40 ? 0X00441b : $3> 15 ? 0x238b45 : 0x66c2a4):xticlabels(2) with boxes ls 1 lc rgb var notitle, \
+plot baseline_file using 1:3:($3>60 ? 0x005a32 : $3> 40 ? 0X238443 : $3> 20 ? 0x41ab5d : $3> 15 ? 0x78c679 : 0xaddd8e):xticlabels(2) with boxes ls 1 lc rgb var notitle, \
 "" u 1:3:3 w labels offset 0,0.3 font "Helvetica,15" notitle
