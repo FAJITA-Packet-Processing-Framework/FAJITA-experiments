@@ -4,7 +4,7 @@ load "../../common.plot"
 font_type = "Helvetica,32"
 font_type_bold = "Helvetica-Bold,32"
 
-set terminal pdf dl 1.5 enhanced dashed size 10.0, 5 font font_type
+set terminal pdf dl 1.5 enhanced dashed size 8, 5 font font_type
 set output "eval-latency.pdf"
 
 set style fill solid 2 border lt -1
@@ -12,19 +12,20 @@ set datafile separator " "
 set style data errorbars
 
 ### Variables
-points_lw = 4
+points_lw = 4.3
 points_size = 2
 line_width = 2
 
 x_start = 0
-x_end = 98
-x_offset = 1
+x_end = 100
+x_offset = 4
 y_min = 0
-y_max = 200
+y_max = 490
 
 ### Input files
-input_file_1 = "csvs/FAJITA-LATENCY.csv"
-input_file_2  = "csvs/Dyssect-LATENCY.csv"
+input_file_1 = "csvs-new/FAJITA-LATENCY.csv"
+input_file_2  = "csvs-new/Dyssect-LATENCY.csv"
+input_file_3  = "csvs-new/DyssectNS-LATENCY.csv"
 # input_file_3  = "results2/FAJITA-TX.csv"
 
 ### Margins
@@ -32,7 +33,7 @@ bm_bottom = 0.16
 tm_bottom = 0.98
 bm_top = 0.26
 tm_top = 0.984
-lm = 0.11
+lm = 0.14
 rm = 0.99
 
 set multiplot layout 1,2 columnsfirst upwards
@@ -68,26 +69,26 @@ set ylabel offset 0.8,-0.5
 set yrange [y_min:y_max]
 set ytics border in scale 1,0.5 norotate mirror
 # set ytics mirror 0.010
-set ytics 20
+set ytics 50
 
 # Legend
 set key outside opaque bottom Right title
 set border back
 set key box linestyle 1 lt rgb(black)
-set key spacing 1.1 font ",32.0"
-set key vertical maxrows 2
+set key spacing 1.1 font ",30.0"
+set key vertical maxrows 3
 set key width 1
 set key height 0.5
 set key samplen 4.0
-# set key at 31,68.3
+# set key at 89,121
 # set key invert
-set key top left inside
+set key top right inside
 set key reverse Left
 
 ### Linestyles
 set style line 1 pointtype 6 pointsize points_size linewidth points_lw linecolor rgb '#00441b'
 set style line 2 pointtype 4 pointsize points_size linewidth points_lw linecolor rgb '#238b45'
-set style line 3 pointtype 8 pointsize points_size linewidth points_lw linecolor rgb '#66c2a4'
+set style line 3 pointtype 8 pointsize points_size linewidth points_lw linecolor rgb '#7bccc4'
 set style line 4 pointtype 10 pointsize points_size linewidth points_lw linecolor rgb '#78c679'
 
 # Highlight the difference
@@ -100,8 +101,10 @@ set style line 4 pointtype 10 pointsize points_size linewidth points_lw linecolo
 
 
 plot \
-	input_file_1  using ($1):($9-100):(($3)-100):(($7)-100) with errorbars ls 4 title "FAJITA",\
-        input_file_2  using ($1):(($9)-100):(($3)-100):(($7)-100) with errorbars ls 1 title "Dyssect",\
-        input_file_1  using ($1):(($9)-100) with lines ls 4 dt 5 notitle,\
-        input_file_2  using ($1):(($9)-100) with lines ls 1 dt 5 notitle
+	input_file_1  using ($1/1000000000):($9):(($3)):(($7)) with errorbars ls 4 title "FAJITA",\
+        input_file_2  using ($1/1000000000):(($9)):(($3)):(($7)) with errorbars ls 1 title "Dyssect",\
+	input_file_3  using ($1/1000000000):(($9)):(($3)):(($7)) with errorbars ls 3 title "Dyssect-NoSolver",\
+	input_file_1  using ($1/1000000000):(($9)) with lines ls 4 dt 5 notitle,\
+        input_file_2  using ($1/1000000000):(($9)) with lines ls 1 dt 4 notitle,\
+        input_file_3  using ($1/1000000000):(($9)) with lines ls 3 dt 2 notitle
 unset multiplot
