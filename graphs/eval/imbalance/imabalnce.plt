@@ -17,15 +17,15 @@ points_size = 2
 line_width = 2
 
 x_start = 0
-x_end = 98
+x_end = 68
 x_offset = 1
 y_min = 0
 y_max = 130
 
 ### Input files
-input_file_1 = "csvs-new/FAJITA-IMBALANCE.csv"
-input_file_2  = "csvs-new/Dyssect-IMBALANCE.csv"
-input_file_3  = "csvs-new/DyssectNS-IMBALANCE.csv"
+input_file_1 = "csvs-new/fixed-csvs/FAJITA-IMBALANCE.csv"
+input_file_2  = "csvs-new/fixed-csvs/Dyssect-IMBALANCE.csv"
+input_file_3  = "csvs-new/fixed-csvs/DyssectNS-IMBALANCE.csv"
 
 ### Margins
 bm_bottom = 0.16

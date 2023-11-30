@@ -17,15 +17,15 @@ points_size = 2
 line_width = 2
 
 x_start = 0
-x_end = 100
+x_end = 68
 x_offset = 4
 y_min = 0
 y_max = 490
 
 ### Input files
-input_file_1 = "csvs-new/FAJITA-LATENCY.csv"
-input_file_2  = "csvs-new/Dyssect-LATENCY.csv"
-input_file_3  = "csvs-new/DyssectNS-LATENCY.csv"
+input_file_1 = "csvs-new/fixed-csvs/FAJITA-LATENCY.csv"
+input_file_2  = "csvs-new/fixed-csvs/Dyssect-LATENCY.csv"
+input_file_3  = "csvs-new/fixed-csvs/DyssectNS-LATENCY.csv"
 # input_file_3  = "results2/FAJITA-TX.csv"
 
 ### Margins
@@ -82,7 +82,7 @@ set key height 0.5
 set key samplen 4.0
 # set key at 89,121
 # set key invert
-set key top right inside
+set key top left inside
 set key reverse Left
 
 ### Linestyles

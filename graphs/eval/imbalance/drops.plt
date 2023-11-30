@@ -17,15 +17,15 @@ points_size = 2
 line_width = 2
 
 x_start = 0
-x_end = 100
+x_end = 68
 x_offset = 4
 y_min = 0
-y_max = 75
+y_max = 35
 
 ### Input files
-input_file_1 = "csvs-new/FAJITA-DROPS.csv"
-input_file_2  = "csvs-new/Dyssect-DROPS.csv"
-input_file_3  = "csvs-new/DyssectNS-DROPS.csv"
+input_file_1 = "csvs-new/fixed-csvs/FAJITA-DROPS.csv"
+input_file_2  = "csvs-new/fixed-csvs/Dyssect-DROPS.csv"
+input_file_3  = "csvs-new/fixed-csvs/DyssectNS-DROPS.csv"
 # input_file_3  = "results2/FAJITA-TX.csv"
 
 ### Margins
@@ -69,7 +69,7 @@ set ylabel offset 0.8,-0.5
 set yrange [y_min:y_max]
 set ytics border in scale 1,0.5 norotate mirror
 # set ytics mirror 0.010
-set ytics 10
+set ytics 5
 
 # Legend
 set key outside opaque bottom Right title
