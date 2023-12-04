@@ -57,7 +57,7 @@ set xtics border in scale 1,0.5 norotate autojustify mirror
 set xrange [-0.5:2.5]
 
 # Y-axis
-set ylabel "Throughput (Gbps)" font "Helvetica-Bold,15"
+set ylabel "Throughput (Mpps)" font "Helvetica-Bold,15"
 set ylabel offset 4.5,0
 set yrange [0:105]
 set ytic 20
@@ -78,5 +78,7 @@ set style line 3 pointtype 8 pointsize points_size linewidth points_lw linecolor
 set style line 4 pointtype 10 pointsize points_size linewidth points_lw linecolor rgb '#0868ac'
 
 plot baseline_file using 3:xtic(2) ls 1 title "VPP", \
-fc_minbatch_file using 3 with histogram ls 3 title "FastClick+BR"
+fc_minbatch_file using 3 with histogram ls 3 title "FastClick+BR", \
+baseline_file using ($0-0.18):3:(sprintf("%.2f", $3)) with labels offset 0,0.3 font "Helvetica, 15" notitle, \
+fc_minbatch_file using ($0+0.18):3:(sprintf("%.2f", $3)) with labels offset 0,0.3 font "Helvetica, 15" notitle,
 # fc_nominbatch_file using 3 with histogram ls 3 title "FastClick w/o Rebuild Batch"

@@ -78,4 +78,5 @@ set style line 2 pointtype 4 pointsize points_size linewidth points_lw linecolor
 set style line 3 pointtype 8 pointsize points_size linewidth points_lw linecolor rgb '#66c2a4'
 set style line 4 pointtype 10 pointsize points_size linewidth points_lw linecolor rgb '#78c679'
 
-plot baseline_file using 5:xtic(1) with histogram ls 1 title "FAJITA w/o Indirect-Prefetch"
+plot baseline_file using 5:xtic(1) with histogram ls 4 title "FAJITA w/o Indirect-Prefetch", \
+"" u 0:5:(sprintf("%.2f", $5)) w labels offset 0,0.3 font "Helvetica,15" notitle

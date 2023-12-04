@@ -78,5 +78,5 @@ set style line 2 pointtype 4 pointsize points_size linewidth points_lw linecolor
 set style line 3 pointtype 8 pointsize points_size linewidth points_lw linecolor rgb '#66c2a4'
 set style line 4 pointtype 10 pointsize points_size linewidth points_lw linecolor rgb '#78c679'
 
-plot baseline_file using ($6 * $2 * 0.008):xtic(2) ls 1 title "FastClick+BR", \
-ref_file using ($6 * $2 * 0.008) with histogram ls 4 title "FAJITA"
+plot baseline_file using ($6 * $2 * 0.008):xtic(2) ls 4 title "FastClick+BR", \
+ref_file using ($6 * $2 * 0.008) with histogram ls 1 title "FAJITA"

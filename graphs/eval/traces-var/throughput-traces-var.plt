@@ -13,7 +13,7 @@ line_width = 2
 ### Margins
 bm_bottom = 0.18
 tm_bottom = 0.98
-lm = 0.12
+lm = 0.14
 rm = 0.98
 
 font_type = "Helvetica,28"
@@ -42,7 +42,7 @@ set key vertical maxrows 2
 set key width 0
 set key height 0.2
 set key samplen 3.0
-set key at 0.857, 67.35
+set key at 0.857, 82.35
 set key font "Helvetica, 15"
 set key invert 
 # set key top left inside
@@ -58,8 +58,8 @@ set xrange [-0.5:2.5]
 
 # Y-axis
 set ylabel "Throughput (Mpps)" font "Helvetica-Bold,15"
-set ylabel offset 3.6,0
-set yrange [0:99]
+set ylabel offset 4.4,0
+set yrange [0:119]
 set ytic 20
 set ytics offset 0.7,0 nomirror
 set tic scale 0.2
@@ -77,5 +77,11 @@ set style line 2 pointtype 4 pointsize points_size linewidth points_lw linecolor
 set style line 3 pointtype 8 pointsize points_size linewidth points_lw linecolor rgb '#66c2a4'
 set style line 4 pointtype 10 pointsize points_size linewidth points_lw linecolor rgb '#78c679'
 
-plot baseline_file using 3:xtic(2) ls 1 title "FastClick+BR", \
-ref_file using 3 with histogram ls 4 title "FAJITA"
+#plot baseline_file using 3:xtic(2) ls 4 title "FastClick+BR", \
+#ref_file using 3 with histogram ls 1 title "FAJITA"
+
+plot baseline_file using 3:xtic(2) ls 4 title "FastClick+BR", \
+     ref_file using ($0+0.18):3:($3) with labels offset 0,0.3 font "Helvetica, 15" notitle, \
+     baseline_file using ($0-0.18):3:(sprintf("%.2f", $3)) with labels offset 0,0.3 font "Helvetica, 15" notitle, \
+     ref_file using 3 with histogram ls 1 title "FAJITA"
+

@@ -73,5 +73,5 @@ set style line 3 pointtype 8 pointsize points_size linewidth points_lw linecolor
 set style line 4 pointtype 10 pointsize points_size linewidth points_lw linecolor rgb '#0868ac'
 
 
-plot baseline_file using 1:3:($3>50 ? 0x78c679 : $3>30 ? 0x00441b : 0x66c2a4):xticlabels(2) with boxes ls 3 lc rgb var notitle,\
+plot baseline_file using 1:3:($3>60 ? 0x00441b : $3>50 ? 0x238b45 : $3>30 ? 0x78c679 : 0xaddd8e):xticlabels(2) with boxes ls 3 lc rgb var notitle,\
 "" u 1:3:3 w labels offset 0,0.3 font "Helvetica,15" notitle

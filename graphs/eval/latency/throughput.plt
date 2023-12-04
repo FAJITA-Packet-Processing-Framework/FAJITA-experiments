@@ -101,8 +101,8 @@ set arrow heads from 90,42 to 90,79 ls 1 linewidth 3 lc rgb 'red' dt 1
 
 
 plot \
-	input_file_2_ways  using (($1*6)/1000000):($5):($4):($6) with errorbars ls 4 title "FAJITA",\
-        input_file_2_ways  using (($1*6)/1000000):($5) with lines ls 4 dt 5 notitle,\
-        input_file_1_way  using (($1*6)/1000000):($5):($4):($6) with errorbars ls 1 title "FastClick+BR",\
-        input_file_1_way  using (($1*6)/1000000):($5) with lines ls 1 dt 5 notitle
+	input_file_2_ways  using (($1*6)/1000000):($5):($4):($6) with errorbars ls 1 title "FAJITA",\
+        input_file_2_ways  using (($1*6)/1000000):($5) with lines ls 1 dt 5 notitle,\
+        input_file_1_way  using (($1*6)/1000000):($5):($4):($6) with errorbars ls 4 title "FastClick+BR",\
+        input_file_1_way  using (($1*6)/1000000):($5) with lines ls 4 dt 5 notitle
 unset multiplot

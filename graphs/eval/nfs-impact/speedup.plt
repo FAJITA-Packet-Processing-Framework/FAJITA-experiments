@@ -10,7 +10,7 @@ points_size = 1
 line_width = 1
 
 ### Margins
-bm_bottom = 0.05
+bm_bottom = 0.18
 tm_bottom = 0.98
 lm = 0.12
 rm = 0.98
@@ -41,15 +41,15 @@ set key horizontal maxrows 1
 set key width -4.0
 set key height 0.4
 set key samplen 3.0
-set key at 3.95, 18.6
+set key at 3.95, 19.6
 set key font "Helvetica, 15"
 
 #set key bottom Left left reverse box width 2
 set xtics font "Helvetica, 15" 
 set ytics font "Helvetica, 15"
 # X-axis
-set xlabel "Number of Indirect Accesses" font "Helvetica-Bold,15"
-set xlabel offset 0,1.6
+set xlabel "Number of NFs" font "Helvetica-Bold,15"
+set xlabel offset 0,1.75
 set xtics offset 0.1,0.7 nomirror
 set xtics border in scale 1,0.5 norotate autojustify mirror
 set xrange [0.5:5.5]
@@ -57,7 +57,7 @@ set xrange [0.5:5.5]
 # Y-axis
 set ylabel "Speedup (%)" font "Helvetica-Bold,15"
 set ylabel offset 3.7,0
-set yrange [0:19]
+set yrange [0:19.9]
 set ytic 4
 set ytics offset 0.7,0 nomirror
 set tic scale 0.2
@@ -76,5 +76,5 @@ set style line 4 pointtype 10 pointsize points_size linewidth points_lw linecolo
 #set arrow heads back filled from -0.4,83 to 1.9,83 ls 1 linewidth 1
 #set label '+84%' at 28.5,42 textcolor ls 1
 
-plot baseline_file using 1:4:xticlabels(1) with boxes ls 4  title "FAJITA w/ Indirect-Prefetch", \
+plot baseline_file using 1:4:xticlabels(1) with boxes ls 1  title "FAJITA w/ Indirect-Prefetch", \
 "" u 1:4:4 w labels offset 0,0.3 font "Helvetica,15" notitle

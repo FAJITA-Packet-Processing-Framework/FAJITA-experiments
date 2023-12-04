@@ -1,10 +1,10 @@
 #!/usr/bin/gnuplot
 load "../../common.plot"
 
-font_type = "Helvetica,32"
-font_type_bold = "Helvetica-Bold,32"
+font_type = "Helvetica,35"
+font_type_bold = "Helvetica-Bold,35"
 
-set terminal pdf dl 1.5 enhanced dashed size 8, 5 font font_type
+set terminal pdf dl 1.5 enhanced dashed size 8, 5.3 font font_type
 set output "eval-drops.pdf"
 
 set style fill solid 2 border lt -1
@@ -12,7 +12,7 @@ set datafile separator " "
 set style data errorbars
 
 ### Variables
-points_lw = 4.3
+points_lw = 4.5
 points_size = 2
 line_width = 2
 
@@ -20,7 +20,7 @@ x_start = 0
 x_end = 68
 x_offset = 4
 y_min = 0
-y_max = 35
+y_max = 33
 
 ### Input files
 input_file_1 = "csvs-new/fixed-csvs/FAJITA-DROPS.csv"
@@ -75,13 +75,13 @@ set ytics 5
 set key outside opaque bottom Right title
 set border back
 set key box linestyle 1 lt rgb(black)
-set key spacing 1.1 font ",32.0"
+set key spacing 1.1 font ",34.0"
 set key vertical maxrows 3
-set key width 1
+set key width 0.5
 set key height 0.5
-set key samplen 4.0
+set key samplen 3.0
 # set key at 31,68.3
-# set key invert
+set key invert
 set key top left inside
 set key reverse Left
 
@@ -101,10 +101,11 @@ set style line 4 pointtype 10 pointsize points_size linewidth points_lw linecolo
 
 
 plot \
-	input_file_1  using ($1/1000000000):($9*100):(($3)*100):(($7)*100) with errorbars ls 4 title "FAJITA",\
-        input_file_2  using ($1/1000000000):(($9)*100):(($3)*100):(($7)*100) with errorbars ls 1 title "Dyssect",\
-	input_file_3  using ($1/1000000000):(($9)*100):(($3)*100):(($7)*100) with errorbars ls 3 title "Dyssect-NoSolver",\
-	input_file_1  using ($1/1000000000):(($9)*100) with lines ls 4 dt 5 notitle,\
-        input_file_2  using ($1/1000000000):(($9)*100) with lines ls 1 dt 4 notitle,\
-        input_file_3  using ($1/1000000000):(($9)*100) with lines ls 3 dt 2 notitle
+	input_file_1  using ($1/1000000000):($9*100):(($3)*100):(($7)*100) with errorbars ls 1 title "FAJITA",\
+	input_file_3  using ($1/1000000000):(($9)*100):(($3)*100):(($7)*100) with errorbars ls 2 title "Dyssect - w/o LB",\
+        input_file_2  using ($1/1000000000):(($9)*100):(($3)*100):(($7)*100) with errorbars ls 4 title "Dyssect",\
+	input_file_1  using ($1/1000000000):(($9)*100) with lines ls 1 dt 5 notitle,\
+        input_file_3  using ($1/1000000000):(($9)*100) with lines ls 2 dt 2 notitle,\
+	input_file_2  using ($1/1000000000):(($9)*100) with lines ls 4 dt 4 notitle
+
 unset multiplot

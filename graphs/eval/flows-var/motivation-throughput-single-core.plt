@@ -1,24 +1,24 @@
 #!/usr/bin/gnuplot
 load "../../common.plot"
 
-font_type = "Helvetica,35"
-font_type_bold = "Helvetica-Bold,35"
+font_type = "Helvetica,42"
+font_type_bold = "Helvetica-Bold,42"
 
-set terminal pdf dl 1.5 enhanced dashed size 10 ,5 font font_type
-set output "motivation-throughput-single-core.pdf"
+set terminal pdf dl 1.5 enhanced dashed size 7 ,6 font font_type
+set output "eval-throughput-flows-var-square.pdf"
 
 set style fill solid 2 border lt -1
 set datafile separator " "
 set style data errorbars
 
 ### Variables
-points_lw = 4
-points_size = 2
+points_lw = 6
+points_size = 3
 line_width = 2
 
-x_start = -10
-x_end = 5790
-x_offset = 100
+x_start = 0
+x_end = 2.790
+x_offset = 0
 y_min = 0
 y_max = 115
 
@@ -29,9 +29,9 @@ input_file_12_ways  = "fajita-csvs/FAJITAOFRXPPS.csv"
 ### Margins
 bm_bottom = 0.17
 tm_bottom = 0.98
-bm_top = 0.26
+bm_top = 0.1
 tm_top = 0.984
-lm = 0.12
+lm = 0.19
 rm = 0.99
 
 set multiplot layout 1,2 columnsfirst upwards
@@ -46,13 +46,13 @@ set rmargin at screen rm
 set border 1+2+4+8 lw 2
 
 # X-axis
-set xlabel "Total Number of Flows (K)"
+set xlabel "Total Number of Flows (m)"
 set xlabel font font_type_bold
-set xlabel offset 0,0.41
+set xlabel offset 0,0.34
 set xrange [x_start:x_end + x_offset]
 #set xtics mirror 1
 # set logscale x 2
-set xtics 1000
+set xtics 0.5
 
 # Grid
 set grid xtics lw 3.0 lt 0
@@ -63,7 +63,7 @@ unset key
 
 # Y-axis
 set ylabel "{/Helvetica:Bold Throughput (Mpps)}"
-set ylabel offset 0.9,-0.5
+set ylabel offset 1.27,0
 set yrange [y_min:y_max]
 set ytics border in scale 1,0.5 norotate mirror
 # set ytics mirror 0.010
@@ -78,9 +78,11 @@ set key vertical maxrows 4
 set key width 0
 set key height 0.5
 set key samplen 4.0
-set key at 5885,92.1
+#set key at 2725,92.1
+set key inside top right
 #set key invert
 set key reverse Left
+set key font ",40"
 
 ### Linestyles
 set style line 1 pointtype 6 pointsize points_size linewidth points_lw linecolor rgb '#00441b'
@@ -94,8 +96,8 @@ set style line 4 pointtype 10 pointsize points_size linewidth points_lw linecolo
 # set arrow nohead from 1.3,217 to 16.4,217 ls 1 linewidth 3 dt 2
 
 plot \
-        input_file_12_ways  using ($1*24/1000):($5):($4):($6) with errorbars ls 4 title "FAJITA",\
-        input_file_12_ways  using ($1*24/1000):($5) with lines ls 4 dt 5 notitle,\
-        input_file_4_ways  using ($1*24/1000):($5):($4):($6) with errorbars ls 1 title "FastClick+BR",\
-        input_file_4_ways  using ($1*24/1000):($5) with lines ls 1 dt 5 notitle
+        input_file_12_ways  using ($1*24/1000000):($5):($4):($6) with errorbars ls 1 title "FAJITA",\
+        input_file_12_ways  using ($1*24/1000000):($5) with lines ls 1 dt 5 notitle,\
+        input_file_4_ways  using ($1*24/1000000):($5):($4):($6) with errorbars ls 4 title "FastClick+BR",\
+        input_file_4_ways  using ($1*24/1000000):($5) with lines ls 4 dt 5 notitle
 unset multiplot

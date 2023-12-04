@@ -1,10 +1,10 @@
 #!/usr/bin/gnuplot
 load "../../common.plot"
 
-font_type = "Helvetica,32"
-font_type_bold = "Helvetica-Bold,32"
+font_type = "Helvetica,35"
+font_type_bold = "Helvetica-Bold,35"
 
-set terminal pdf dl 1.5 enhanced dashed size 8.0, 5 font font_type
+set terminal pdf dl 1.5 enhanced dashed size 8.0, 5.3 font font_type
 set output "eval-imbalance.pdf"
 
 set style fill solid 2 border lt -1
@@ -12,7 +12,7 @@ set datafile separator " "
 set style data errorbars
 
 ### Variables
-points_lw = 4
+points_lw = 4.5
 points_size = 2
 line_width = 2
 
@@ -32,7 +32,7 @@ bm_bottom = 0.16
 tm_bottom = 0.98
 bm_top = 0.26
 tm_top = 0.984
-lm = 0.14
+lm = 0.15
 rm = 0.99
 
 set multiplot layout 1,2 columnsfirst upwards
@@ -63,7 +63,7 @@ set grid ytics lw 3.0 lt 0
 unset key
 
 # Y-axis
-set ylabel "{/Helvetica:Bold Imbalance (\%)}"
+set ylabel "{/Helvetica:Bold Load Imbalance (\%)}"
 set ylabel offset 0.8,-0.5
 set yrange [y_min:y_max]
 set ytics border in scale 1,0.5 norotate mirror
@@ -74,11 +74,11 @@ set ytics 20
 set key outside opaque bottom Right title
 set border back
 set key box linestyle 1 lt rgb(black)
-set key spacing 1.1 font ",32.0"
+set key spacing 1.1 font ",34.0"
 set key vertical maxrows 3
-set key width 1
+set key width 0
 set key height 0.5
-set key samplen 4.0
+set key samplen 3.0
 # set key at 31,68.3
 # set key invert
 set key top right inside
@@ -100,10 +100,10 @@ set style line 4 pointtype 10 pointsize points_size linewidth points_lw linecolo
 
 
 plot \
-	input_file_1  using ($1/1000000000):($9-100):(($4)-100):(($6)-100) with errorbars ls 4 title "FAJITA",\
-        input_file_2  using ($1/1000000000):(($9)-100):(($4)-100):(($6)-100) with errorbars ls 1 title "Dyssect",\
-	input_file_3  using ($1/1000000000):(($9)-100):(($4)-100):(($6)-100) with errorbars ls 3 title "Dyssect-No-Solver",\
-        input_file_1  using ($1/1000000000):(($9)-100) with lines ls 4 dt 5 notitle,\
-        input_file_2  using ($1/1000000000):(($9)-100) with lines ls 1 dt 4 notitle,\
-	input_file_3  using ($1/1000000000):(($9)-100) with lines ls 3 dt 2 notitle
+	input_file_1  using ($1/1000000000):($9-100):(($4)-100):(($6)-100) with errorbars ls 1 title "FAJITA",\
+	input_file_3  using ($1/1000000000):(($9)-100):(($4)-100):(($6)-100) with errorbars ls 2 title "Dyssect - w/o LB",\
+	input_file_2  using ($1/1000000000):(($9)-100):(($4)-100):(($6)-100) with errorbars ls 4 title "Dyssect",\
+        input_file_1  using ($1/1000000000):(($9)-100) with lines ls 1 dt 5 notitle,\
+	input_file_3  using ($1/1000000000):(($9)-100) with lines ls 2 dt 2 notitle,\
+	input_file_2  using ($1/1000000000):(($9)-100) with lines ls 4 dt 4 notitle
 unset multiplot
