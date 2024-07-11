@@ -90,5 +90,5 @@ set style line 4 pointtype 10 pointsize points_size linewidth points_lw linecolo
 # set arrow nohead from 1.3,217 to 16.4,217 ls 1 linewidth 3 dt 2
 
 plot 'caida-cdf.csv' every ::1::450 using ($1):($2*100) with lines ls 1 dt 1 title "CAIDA",\
-     'kth-cdf.csv' every ::1::400 using ($1):($2*100) with lines ls 4 dt 2 title "Campus"
+     'kth-cdf.csv' every ::1::400 using ($1):($2*100) with lines ls 4 dt 2 linewidth 6 title "Campus"
 unset multiplot

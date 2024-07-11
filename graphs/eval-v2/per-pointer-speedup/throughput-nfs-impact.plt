@@ -43,6 +43,7 @@ set key height 0.5
 set key samplen 1.0
 set key at 4.42, 100.1
 set key font "Helvetica, 13"
+set key invert
 
 #set key bottom Left left reverse box width 2
 set xtics font "Helvetica, 15" 
