@@ -1,0 +1,121 @@
+%info
+Module to create trace files that the 5tuple hash value of the packet and the "predicted" upcoming packet are written on the source and destination mac addresses respectively.
+
+%variables
+PREFETCH=0
+FLOWS=200
+GEN_LENGTH=64
+
+%late_variables
+gdb:GEN_GDB=gdb -ex run -ex "signal 2" -ex "bt" -batch -args
+
+%script deps=fastclick sudo=true name=trace_generator
+// rm -rf /mnt/traces/synthetic/*
+$GEN_GDB /home/hamid/workspace/rdma/nf/fastclick/bin/click --dpdk -l 0-15 -- TRACEGEN_CONFIG
+
+%file TRACEGEN_CONFIG
+d :: DPDKInfo(7000000)
+
+define($flows $FLOWS)
+define($distance $PREFETCH)
+define($bout 32)
+define($INsrcmac fe:dc:ba:98:76:54)
+
+define($INdstmac 12:34:56:78:9a:bc)
+
+define($ignore 0)
+define($port 0000:11:00.1)
+define($txverbose 99)
+define($rxverbose 99)
+
+elementclass MyNull { [0-7]=>[0- 7 ]; };
+
+fdIN0 :: FastUDPFlows(RATE 0, LIMIT -1, LENGTH $GEN_LENGTH, SRCETH $INsrcmac, DSTETH 00:34:56:78:9a:b0 , SRCIP 10.60.1.101, DSTIP 127.0.0.1, FLOWS $flows, FLOWSIZE 64048576, SEQ_PORTS 1, SPORTSTART 2000, DPORT 5000, SEQUENTIAL 1)
+fdIN1 :: FastUDPFlows(RATE 0, LIMIT -1, LENGTH $GEN_LENGTH, SRCETH $INsrcmac, DSTETH 00:34:56:78:9a:b1, SRCIP 10.60.1.101, DSTIP 127.0.0.2, FLOWS $flows, FLOWSIZE 64048576, SEQ_PORTS 1, SPORTSTART 2000, DPORT 5001, SEQUENTIAL 1)
+fdIN2 :: FastUDPFlows(RATE 0, LIMIT -1, LENGTH $GEN_LENGTH, SRCETH $INsrcmac, DSTETH 00:34:56:78:9a:b2, SRCIP 10.60.1.101, DSTIP 127.0.0.3, FLOWS $flows, FLOWSIZE 64048576, SEQ_PORTS 1, SPORTSTART 2000, DPORT 5002, SEQUENTIAL 1)
+fdIN3 :: FastUDPFlows(RATE 0, LIMIT -1, LENGTH $GEN_LENGTH, SRCETH $INsrcmac, DSTETH 00:34:56:78:9a:b3, SRCIP 10.60.1.101, DSTIP 127.0.0.4, FLOWS $flows, FLOWSIZE 64048576, SEQ_PORTS 1, SPORTSTART 2000, DPORT 5003, SEQUENTIAL 1)
+fdIN4 :: FastUDPFlows(RATE 0, LIMIT -1, LENGTH $GEN_LENGTH, SRCETH $INsrcmac, DSTETH 00:34:56:78:9a:b4, SRCIP 10.60.1.101, DSTIP 127.0.0.5, FLOWS $flows, FLOWSIZE 64048576, SEQ_PORTS 1, SPORTSTART 2000, DPORT 5004, SEQUENTIAL 1)
+fdIN5 :: FastUDPFlows(RATE 0, LIMIT -1, LENGTH $GEN_LENGTH, SRCETH $INsrcmac, DSTETH 00:34:56:78:9a:b5, SRCIP 10.60.1.101, DSTIP 127.0.0.6, FLOWS $flows, FLOWSIZE 64048576, SEQ_PORTS 1, SPORTSTART 2000, DPORT 5005, SEQUENTIAL 1)
+fdIN6 :: FastUDPFlows(RATE 0, LIMIT -1, LENGTH $GEN_LENGTH, SRCETH $INsrcmac, DSTETH 00:34:56:78:9a:b6, SRCIP 10.60.1.101, DSTIP 127.0.0.7, FLOWS $flows, FLOWSIZE 64048576, SEQ_PORTS 1, SPORTSTART 2000, DPORT 5006, SEQUENTIAL 1)
+fdIN7 :: FastUDPFlows(RATE 0, LIMIT -1, LENGTH $GEN_LENGTH, SRCETH $INsrcmac, DSTETH 00:34:56:78:9a:b7, SRCIP 10.60.1.101, DSTIP 127.0.0.8, FLOWS $flows, FLOWSIZE 64048576, SEQ_PORTS 1, SPORTSTART 2000, DPORT 5007, SEQUENTIAL 1)
+// fdIN8 :: FastUDPFlows(RATE 0, LIMIT -1, LENGTH $GEN_LENGTH, SRCETH $INsrcmac, DSTETH 00:34:56:78:9a:b8, SRCIP 10.60.1.101, DSTIP 127.0.0.9, FLOWS $flows, FLOWSIZE 64048576, SEQ_PORTS 1, SPORTSTART 2000, DPORT 5008, SEQUENTIAL 1)
+// fdIN9 :: FastUDPFlows(RATE 0, LIMIT -1, LENGTH $GEN_LENGTH, SRCETH $INsrcmac, DSTETH 00:34:56:78:9a:b9, SRCIP 10.60.1.101, DSTIP 127.0.0.10, FLOWS $flows, FLOWSIZE 64048576, SEQ_PORTS 1, SPORTSTART 2000, DPORT 5009, SEQUENTIAL 1)
+// fdIN10 :: FastUDPFlows(RATE 0, LIMIT -1, LENGTH $GEN_LENGTH, SRCETH $INsrcmac, DSTETH 00:34:56:78:9a:ba, SRCIP 10.60.1.101, DSTIP 127.0.0.11, FLOWS $flows, FLOWSIZE 64048576, SEQ_PORTS 1, SPORTSTART 2000, DPORT 5010, SEQUENTIAL 1)
+// fdIN11 :: FastUDPFlows(RATE 0, LIMIT -1, LENGTH $GEN_LENGTH, SRCETH $INsrcmac, DSTETH 00:34:56:78:9a:bb, SRCIP 10.60.1.101, DSTIP 127.0.0.12, FLOWS $flows, FLOWSIZE 64048576, SEQ_PORTS 1, SPORTSTART 2000, DPORT 5011, SEQUENTIAL 1)
+// fdIN12 :: FastUDPFlows(RATE 0, LIMIT -1, LENGTH $GEN_LENGTH, SRCETH $INsrcmac, DSTETH 00:34:56:78:9a:bc, SRCIP 10.60.1.101, DSTIP 127.0.0.13, FLOWS $flows, FLOWSIZE 64048576, SEQ_PORTS 1, SPORTSTART 2000, DPORT 5012, SEQUENTIAL 1)
+// fdIN13 :: FastUDPFlows(RATE 0, LIMIT -1, LENGTH $GEN_LENGTH, SRCETH $INsrcmac, DSTETH 00:34:56:78:9a:bd, SRCIP 10.60.1.101, DSTIP 127.0.0.14, FLOWS $flows, FLOWSIZE 64048576, SEQ_PORTS 1, SPORTSTART 2000, DPORT 5013, SEQUENTIAL 1)
+// fdIN14 :: FastUDPFlows(RATE 0, LIMIT -1, LENGTH $GEN_LENGTH, SRCETH $INsrcmac, DSTETH 00:34:56:78:9a:be, SRCIP 10.60.1.101, DSTIP 127.0.0.15, FLOWS $flows, FLOWSIZE 64048576, SEQ_PORTS 1, SPORTSTART 2000, DPORT 5014, SEQUENTIAL 1)
+// fdIN15 :: FastUDPFlows(RATE 0, LIMIT -1, LENGTH $GEN_LENGTH, SRCETH $INsrcmac, DSTETH 00:34:56:78:9a:bf, SRCIP 10.60.1.101, DSTIP 127.0.0.16, FLOWS $flows, FLOWSIZE 64048576, SEQ_PORTS 1, SPORTSTART 2000, DPORT 5015, SEQUENTIAL 1)
+
+elementclass NoTimestampDiff { $a, $b, $c, $d |
+input -> output;
+Idle->[1]output;
+}
+
+elementclass Numberise { $magic |
+    input-> Strip(14)
+     -> check :: MarkIPHeader
+    -> ResetIPChecksum() -> Unstrip(14) -> output
+}
+
+ender :: Script(TYPE PASSIVE,
+                print "Limit of 700000000 reached",
+                stop,
+                stop);
+ rr :: MyNull; 
+
+fdIN0-> limit0   :: Counter(COUNT_CALL 98333330 ender.run)-> unqueue0 ::  RatedUnqueue(2500000, BURST 1)  -> [0]rr
+fdIN1-> limit1   :: Counter(COUNT_CALL 98333330 ender.run)-> unqueue1 ::  RatedUnqueue(2500000, BURST 1)  -> [1]rr
+fdIN2-> limit2   :: Counter(COUNT_CALL 98333330 ender.run)-> unqueue2 ::  RatedUnqueue(2500000, BURST 1)  -> [2]rr
+fdIN3-> limit3   :: Counter(COUNT_CALL 98333330 ender.run)-> unqueue3 ::  RatedUnqueue(2500000, BURST 1)  -> [3]rr
+fdIN4-> limit4   :: Counter(COUNT_CALL 98333330 ender.run)-> unqueue4 ::  RatedUnqueue(2500000, BURST 1)  -> [4]rr
+fdIN5-> limit5   :: Counter(COUNT_CALL 98333330 ender.run)-> unqueue5 ::  RatedUnqueue(2500000, BURST 1)  -> [5]rr
+fdIN6-> limit6   :: Counter(COUNT_CALL 98333330 ender.run)-> unqueue6 ::  RatedUnqueue(2500000, BURST 1)  -> [6]rr
+fdIN7-> limit7   :: Counter(COUNT_CALL 98333330 ender.run)-> unqueue7 ::  RatedUnqueue(2500000, BURST 1)  -> [7]rr
+// fdIN8-> limit8   :: Counter(COUNT_CALL 98333330 ender.run)-> unqueue8 ::  RatedUnqueue(2500000, BURST 1)  -> [8]rr
+// fdIN9-> limit9   :: Counter(COUNT_CALL 98333330 ender.run)-> unqueue9 ::  RatedUnqueue(2500000, BURST 1)  -> [9]rr
+// fdIN10-> limit10   :: Counter(COUNT_CALL 98333330 ender.run)-> unqueue10 ::  RatedUnqueue(2500000, BURST 1)  -> [10]rr
+// fdIN11-> limit11   :: Counter(COUNT_CALL 98333330 ender.run)-> unqueue11 ::  RatedUnqueue(2500000, BURST 1)  -> [11]rr
+// fdIN12-> limit12   :: Counter(COUNT_CALL 98333330 ender.run)-> unqueue12 ::  RatedUnqueue(2500000, BURST 1)  -> [12]rr
+// fdIN13-> limit13   :: Counter(COUNT_CALL 98333330 ender.run)-> unqueue13 ::  RatedUnqueue(2500000, BURST 1)  -> [13]rr
+// fdIN14-> limit14   :: Counter(COUNT_CALL 98333330 ender.run)-> unqueue14 ::  RatedUnqueue(2500000, BURST 1)  -> [14]rr
+// fdIN15-> limit15   :: Counter(COUNT_CALL 98333330 ender.run)-> unqueue15 ::  RatedUnqueue(2500000, BURST 1)  -> [15]rr
+
+elementclass Generator { $magic |
+input
+ 
+  -> MarkMACHeader
+  -> EnsureDPDKBuffer
+//  -> EtherRewrite($INsrcmac,$INdstmac)
+//  -> EtherHash(DISTANCE $distance)
+  -> Numberise($magic)
+  -> avgSIN :: AverageCounter(IGNORE $ignore)
+  -> output;
+}
+
+rr[0]-> gen0 :: Generator(\<5700>)-> ToIPSummaryDump("/mnt/traces/synthetic/flow-prefetch-$flows.pcap-1", BINARY true, FIELDS timestamp ip_src ip_dst sport dport ip_len ip_proto eth_type);StaticThreadSched(fdIN0 0/1 , unqueue0 0/1)
+rr[1]-> gen1 :: Generator(\<5701>)-> ToIPSummaryDump("/mnt/traces/synthetic/flow-prefetch-$flows.pcap-2", BINARY true, FIELDS timestamp ip_src ip_dst sport dport ip_len ip_proto eth_type);StaticThreadSched(fdIN1 0/2 , unqueue1 0/2)
+rr[2]-> gen2 :: Generator(\<5702>)-> ToIPSummaryDump("/mnt/traces/synthetic/flow-prefetch-$flows.pcap-3", BINARY true, FIELDS timestamp ip_src ip_dst sport dport ip_len ip_proto eth_type);StaticThreadSched(fdIN2 0/3 , unqueue2 0/3)
+rr[3]-> gen3 :: Generator(\<5703>)-> ToIPSummaryDump("/mnt/traces/synthetic/flow-prefetch-$flows.pcap-4", BINARY true, FIELDS timestamp ip_src ip_dst sport dport ip_len ip_proto eth_type);StaticThreadSched(fdIN3 0/4 , unqueue3 0/4)
+rr[4]-> gen4 :: Generator(\<5704>)-> ToIPSummaryDump("/mnt/traces/synthetic/flow-prefetch-$flows.pcap-5", BINARY true, FIELDS timestamp ip_src ip_dst sport dport ip_len ip_proto eth_type);StaticThreadSched(fdIN4 0/5 , unqueue4 0/5)
+rr[5]-> gen5 :: Generator(\<5705>)-> ToIPSummaryDump("/mnt/traces/synthetic/flow-prefetch-$flows.pcap-6", BINARY true, FIELDS timestamp ip_src ip_dst sport dport ip_len ip_proto eth_type);StaticThreadSched(fdIN5 0/6 , unqueue5 0/6)
+rr[6]-> gen6 :: Generator(\<5706>)-> ToIPSummaryDump("/mnt/traces/synthetic/flow-prefetch-$flows.pcap-7", BINARY true, FIELDS timestamp ip_src ip_dst sport dport ip_len ip_proto eth_type);StaticThreadSched(fdIN6 0/7 , unqueue6 0/7)
+rr[7]-> gen7 :: Generator(\<5707>)-> ToIPSummaryDump("/mnt/traces/synthetic/flow-prefetch-$flows.pcap-8", BINARY true, FIELDS timestamp ip_src ip_dst sport dport ip_len ip_proto eth_type);StaticThreadSched(fdIN7 0/8 , unqueue7 0/8)
+// rr[8]-> gen8 :: Generator(\<5708>)-> ToIPSummaryDump("/mnt/traces/synthetic/flow-prefetch-$flows.pcap-9", BINARY true, FIELDS timestamp ip_src ip_dst sport dport ip_len ip_proto eth_type);StaticThreadSched(fdIN8 0/9 , unqueue8 0/9)
+// rr[9]-> gen9 :: Generator(\<5709>)-> ToIPSummaryDump("/mnt/traces/synthetic/flow-prefetch-$flows.pcap-10", BINARY true, FIELDS timestamp ip_src ip_dst sport dport ip_len ip_proto eth_type);StaticThreadSched(fdIN9 0/10 , unqueue9 0/10)
+// rr[10]-> gen10 :: Generator(\<570a>)-> ToIPSummaryDump("/mnt/traces/synthetic/flow-prefetch-$flows.pcap-11", BINARY true, FIELDS timestamp ip_src ip_dst sport dport ip_len ip_proto eth_type);StaticThreadSched(fdIN10 0/11 , unqueue10 0/11)
+// rr[11]-> gen11 :: Generator(\<570b>)-> ToIPSummaryDump("/mnt/traces/synthetic/flow-prefetch-$flows.pcap-12", BINARY true, FIELDS timestamp ip_src ip_dst sport dport ip_len ip_proto eth_type);StaticThreadSched(fdIN11 0/12 , unqueue11 0/12)
+// rr[12]-> gen12 :: Generator(\<570c>)-> ToDump("/mnt/traces/synthetic/flow-prefetch-$flows.pcap-13");StaticThreadSched(fdIN12 0/13 , unqueue12 0/13)
+// rr[13]-> gen13 :: Generator(\<570d>)-> ToDump("/mnt/traces/synthetic/flow-prefetch-$flows.pcap-14");StaticThreadSched(fdIN13 0/14 , unqueue13 0/14)
+// rr[14]-> gen14 :: Generator(\<570e>)-> ToDump("/mnt/traces/synthetic/flow-prefetch-$flows.pcap-15");StaticThreadSched(fdIN14 0/15 , unqueue14 0/15)
+// rr[15]-> gen15 :: Generator(\<570f>)-> ToDump("/mnt/traces/synthetic/flow-prefetch-$flows.pcap-16");StaticThreadSched(fdIN15 0/0 , unqueue15 0/0)
+
+
+dm :: DriverManager(  print "Waiting 2 seconds before launching generation...",
+                wait 2s,
+                print "EVENT TRACE_GENERATION_BEGIN",
+                wait 20,
+                print "EVENT TRACE_GENERATION_DONE",
+                stop);
+
+
