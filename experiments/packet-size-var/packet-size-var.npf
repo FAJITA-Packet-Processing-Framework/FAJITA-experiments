@@ -41,7 +41,7 @@ min_batch:MINBATCH=TRUE
 synthetic,flowsvar:FLOWS={256,500,1000,2000,4000,8000,16000,32000,64000}
 synthetic,-flowsvar:FLOWS=128000
 PKTGEN_REPLAY_COUNT=100
-GEN_LENGTH=64
+GEN_LENGTH=1000
 pktsizevar:GEN_LENGTH={64,128,256,512,1024}
 GEN_DUMP=1
 GEN_BURST=32
@@ -99,15 +99,13 @@ LIMIT=100000000
 timeout=120
 accept_zero={NFRXDROPPED,.*DROPPED.*,NFPHYDROPPED,RX,C_BPS,C_PPS}
 var_unit={TX:bps,RX:bps,RXCOUNT: ,RATE:pps,LINKRATE:bps}
-var_name={NFTXPPS: Output throughput (MPPS),OFTXPPS: Input Rate (Mpps), OFRXPPS: Throughput (Mpps), OFRX: Throughput (Gbps),LAT50: Median latency (μs), LAT99:99th percentile latency (μs), GEN_RATE:Input Packet Rate (Mpps),CBPS_FIN:Output throughput (Gbps),C_BPS:Output throughput (Gbps),C_PPS:Output packet rate (Mpps),FRATE:NF packet rate (Mpps),GEN_LENGTH:Packet length (B),GEN_RATE_GBPS:Input Rate (Gbps),NFDROPPEDPC:Traffic dropped by NF (%),NF_S:Size of static data in memory (MB),NF_CPU:CPU cores on the NF,BENCHRES:CPU Copy memory bandwidth (MB/s)}
-var_divider={OFRXPPS:1000000,OFTXPPS:1000000,GEN_RATE:250000,CBPS_FIN:1000000000,C_BPS:1000000000,FRATE:1000000,C_PPS:1000000,TOFRXPPS:1000000,NFTXPPS:1000000,GEN_RATE_GBPS:1,NFDROPPEDPC:0.01}
+var_name={GEN_LENGTH: Packet Size (B), NFTXPPS: Output throughput (MPPS),OFTXPPS: Input Rate (Mpps), OFRX: Throughput (Gbps), OFRXPPS: Throughput (Mpps),LAT50: Median latency (μs), LAT99:99th percentile latency (μs), GEN_RATE:Input Packet Rate (Mpps),CBPS_FIN:Output throughput (Gbps),C_BPS:Output throughput (Gbps),C_PPS:Output packet rate (Mpps),FRATE:NF packet rate (Mpps),GEN_LENGTH:Packet length (B),GEN_RATE_GBPS:Input Rate (Gbps),NFDROPPEDPC:Traffic dropped by NF (%),NF_S:Size of static data in memory (MB),NF_CPU:CPU cores on the NF,BENCHRES:CPU Copy memory bandwidth (MB/s)}
+var_divider={OFRX:1000000000, OFRXPPS:1000000,OFTXPPS:1000000,GEN_RATE:250000,CBPS_FIN:1000000000,C_BPS:1000000000,FRATE:1000000,C_PPS:1000000,TOFRXPPS:1000000,NFTXPPS:1000000,GEN_RATE_GBPS:1,NFDROPPEDPC:0.01}
 // recirculate:var_divider={GEN_RATE:41666.666}
 var_format={GEN_RATE:%d,C_BPS:%d,FRATE:%d,NFDROPPEDPC:%d,CBPS_FIN:%d,C_PPS:%d,C_BPS:%d}
 nflim:n_runs=1
 var_lim={result-C_BPS:0-320, LATENCY:0-1000, LAT99:0-1000, LAT50:0-130, TOFRXPPS:0-50, NFTXPPS:0-14}
 avg:var_lim+={result-FRATE:0-40}
-
-graph_cross_reference={LAT99:OFTXPPS, LATENCY:OFTXPPS, OFRXPPS:OFTXPPS}
 
 // ****************** CLIENT SCRIPTS ******************** //
 
