@@ -1,0 +1,652 @@
+%info
+Generate some traffic for 10 seconds and print various metrics
+
+Source:
+--tags trace pcap: Use the caida trace.
+--tags udpgen replay maxrate: Generate UDP flow
+--tags prate --variables GEN_THREADS=12 : Generate UDP flows at a given rate
+
+Rate (not with trace):
+Normally the request rate is set in packets with GEN_RATE=1000 for instance.
+--tags autorate --variables GEN_RATE_GPBS=100: will allow to compute automatically the good rate for GEN_RATE according to the packet length, recirculation and multicast
+
+Optional features:
+--tags perf : Will profile and display cache miss stats about the NF
+
+%variables
+
+//Various kind of parameters
+MANAGER=FlowIPManager_DPDK
+
+
+solver:ENABLESOLVER=true
+-solver:ENABLESOLVER=false
+
+aux:AUX=1
+-aux:AUX=0
+
+lb:NFCOUNT=lb
+one:NFCOUNT=one
+two:NFCOUNT=two
+three:NFCOUNT=three
+share:NFCOUNT=sharefajita
+share,freshfc:NFCOUNT=sharefc
+-one,-two,-three,-share,-lb:NFCOUNT=one
+
+-min_batch:MINBATCH=FALSE
+min_batch:MINBATCH=TRUE
+
+//........ POSSIBLE GENERATOR CONFIGURATIONS ........\\
+
+synthetic,flowsvar:FLOWS={256,500,1000,2000,4000,8000,16000,32000,64000}
+synthetic,-flowsvar:FLOWS=128000
+PKTGEN_REPLAY_COUNT=100
+GEN_LENGTH=1000
+pktsizevar:GEN_LENGTH={64,128,256,512,1024}
+GEN_DUMP=1
+GEN_BURST=32
+GEN_DESC=1024
+RX_QUEUES=1
+PAUSE=full
+ratevar:GEN_RATE=[1000000-14000000#1000000]
+-ratevar:GEN_RATE=1000000
+GEN_THREADS=6
+GEN_MULTI_TRACE=1
+LIMIT_TIME=5
+GEN_BIN=click
+GEN_CLICK_DIR=/home/hamid/workspace/prefetch/repo/fastclick-gen2/fastclick/bin/
+trace=/mnt/traces/caida-18/summaries/caida18-32x.forcedudp.pcap
+campus:trace=/mnt/traces/campus-split/ip_summary_tx_forcedudp/all-8combined_udp_bin.dump
+
+
+
+//........ POSSIBLE TOFINO CONFIGURATIONS ........\\
+MCAST=1
+RECIRCULATE=1
+
+
+//........ NF CONFIGURATION ........\\
+
+FAJITA_CLICK_DIR=/home/hamid/workspace/prefetch/repo/rack35/fajita/fastclick/
+FASTCLICK_CLICK_DIR=/home/hamid/workspace/prefetch/repo/rack35/fastclick/
+VPP_INSTALL_DIR=/home/hamid/workspace/prefetch/repo/vpp-customized/vpp/
+
+NF_CPU=16
+coresvar:NF_CPU={1,2,4,8,16}
+NF_NDESC=2048
+NF_BIN=click
+RCV_BURST=64
+//CAPA=32000000
+
+
+gdb:GDB=gdb -ex run -ex "signal 2" -ex bt -batch -args
+SCALE=SHARE
+
+%late_variables
+TOTAL-FLOWS=EXPAND($(( $FLOWS * 8 )))
+VPP_MAX_CORE=EXPAND($(( (min(15,$NF_CPU) ) )))
+CAPA=EXPAND($(( int( $NF_CPU * 16000000 ) if $NF_CPU < 5 else 120000000 )))
+
+-freshfc:NF_CLICK_DIR=EXPAND( $FAJITA_CLICK_DIR )
+freshfc:NF_CLICK_DIR=EXPAND( $FASTCLICK_CLICK_DIR )
+
+%synthetic:late_variables
+trace=EXPAND(/mnt/traces/synthetic/flow-prefetch-${FLOWS}.pcap)
+GEN_THREADS=8
+LIMIT=100000000
+
+%config
+//All sorts of configration variables
+timeout=120
+accept_zero={NFRXDROPPED,.*DROPPED.*,NFPHYDROPPED,RX,C_BPS,C_PPS}
+var_unit={TX:bps,RX:bps,RXCOUNT: ,RATE:pps,LINKRATE:bps}
+var_name={NF_CPU: Available CPU Cores, GEN_LENGTH: Packet Size (B), NFTXPPS: Output throughput (MPPS),OFTXPPS: Input Rate (Mpps), OFRX: Throughput (Gbps), OFRXPPS: Throughput (Mpps),LAT50: Median latency (μs), LAT99:99th percentile latency (μs), GEN_RATE:Input Packet Rate (Mpps),CBPS_FIN:Output throughput (Gbps),C_BPS:Output throughput (Gbps),C_PPS:Output packet rate (Mpps),FRATE:NF packet rate (Mpps),GEN_LENGTH:Packet length (B),GEN_RATE_GBPS:Input Rate (Gbps),NFDROPPEDPC:Traffic dropped by NF (%),NF_S:Size of static data in memory (MB),NF_CPU:CPU cores on the NF,BENCHRES:CPU Copy memory bandwidth (MB/s)}
+var_divider={OFRX:1000000000, OFRXPPS:1000000,OFTXPPS:1000000,GEN_RATE:250000,CBPS_FIN:1000000000,C_BPS:1000000000,FRATE:1000000,C_PPS:1000000,TOFRXPPS:1000000,NFTXPPS:1000000,GEN_RATE_GBPS:1,NFDROPPEDPC:0.01}
+// recirculate:var_divider={GEN_RATE:41666.666}
+var_format={GEN_RATE:%d,C_BPS:%d,FRATE:%d,NFDROPPEDPC:%d,CBPS_FIN:%d,C_PPS:%d,C_BPS:%d}
+nflim:n_runs=1
+var_lim={result-C_BPS:0-320, LATENCY:0-1000, LAT99:0-1000, LAT50:0-130, TOFRXPPS:0-50, NFTXPPS:0-14}
+avg:var_lim+={result-FRATE:0-40}
+
+graph_cross_reference={NFLLCMISSESPP:NFFLOWS, OFRXPPS:NFFLOWS}
+
+// ****************** CLIENT SCRIPTS ******************** //
+
+%-synthetic:import@client fastclick-generator delay=25 waitfor=TOFINO_READY GEN_PIPELINE=0 PKTGEN_REPLAY_COUNT=1
+%synthetic:import@client trace_generator_prefetch autokill=false
+%synthetic:import@client fastclick-generator delay=25 waitfor=TOFINO_READY GEN_PIPELINE=0 GEN_THREADS=1 PKTGEN_REPLAY_COUNT=1 
+
+
+// ****************** HARDWARE STATISTICS ******************** //
+
+
+%perf:import@nf perf-stat N_CORES=1 PERF_TIME=9 delay=27 waitfor=TOFINO_READY
+
+
+// ****************** TOFINO SCRIPTS ******************** //
+
+%script@tofino background=true  autokill=false
+export SDE_INSTALL=/home/tofino/bf-sde-9.11.1/install
+export SDE=/home/tofino/bf-sde-9.11.1
+sudo killall -9 run_switchd.sh
+sudo killall -9 run_bfshell.sh
+sudo killall -9 bfshell
+sudo killall -9 bf_switchd
+echo "EVENT TOFINO_INIT"
+$SDE/run_switchd.sh --arch tf2 -p fajita_fwd
+
+%script@tofino waitfor=TOFINO_INIT delay=5
+export SDE_INSTALL=/home/tofino/bf-sde-9.11.1/install
+export SDE=/home/tofino/bf-sde-9.11.1
+echo "EVENT TOFINO_READY"
+$SDE/run_bfshell.sh -i -b /home/tofino/labs/fajita-fwd/setup.py
+
+%init@nf sudo=true
+sudo killall vpp_main
+echo "EVENT VPP_KILLED!"
+
+%vpp:script@nf sudo=true autokill=false background=true
+cd $VPP_INSTALL_DIR
+sed -i "s/corelist-workers 1-[0-9]*/corelist-workers 1-$VPP_MAX_CORE/" ../exp-startup.conf
+echo "EVENT VPP_START"
+sudo ./build-root/install-vpp-native/vpp/bin/vpp -c ../exp-startup.conf
+
+// ****************** VPP SCRIPTS ******************** //
+
+%one,vpp:script@nf sudo=true autokill=false waitfor=VPP_START delay=5
+cd $VPP_INSTALL_DIR
+sudo ./build-root/install-vpp-native/vpp/bin/vppctl set interface promiscuous on eth0
+sudo ./build-root/install-vpp-native/vpp/bin/vppctl flowcounter macswap eth0
+sudo ./build-root/install-vpp-native/vpp/bin/vppctl set interface state eth0 up
+
+%two,vpp:script@nf sudo=true autokill=false waitfor=VPP_START delay=5
+cd $VPP_INSTALL_DIR
+sudo ./build-root/install-vpp-native/vpp/bin/vppctl set interface promiscuous on eth0
+sudo ./build-root/install-vpp-native/vpp/bin/vppctl ratelimiter macswap eth0
+sudo ./build-root/install-vpp-native/vpp/bin/vppctl set interface state eth0 up
+
+%three,vpp:script@nf sudo=true autokill=false waitfor=VPP_START delay=5
+cd $VPP_INSTALL_DIR
+sudo ./build-root/install-vpp-native/vpp/bin/vppctl set interface promiscuous on eth0
+sudo ./build-root/install-vpp-native/vpp/bin/vppctl clb macswap eth0
+sudo ./build-root/install-vpp-native/vpp/bin/vppctl set interface state eth0 up
+
+%share,vpp:script@nf sudo=true autokill=false waitfor=VPP_START delay=5
+cd $VPP_INSTALL_DIR
+sudo ./build-root/install-vpp-native/vpp/bin/vppctl set interface promiscuous on eth0
+sudo ./build-root/install-vpp-native/vpp/bin/vppctl cpolicer macswap eth0
+sudo ./build-root/install-vpp-native/vpp/bin/vppctl set interface state eth0 up
+
+
+%-one,-two,-three,-share,vpp:script@nf sudo=true autokill=false waitfor=VPP_START
+echo "number of NFs in the chain is not determined! possible tag options : one, two, three"
+
+
+// **************** Dyssect SCRIPTS ****************** //
+
+%dyssect,solver:script@nf
+export GUROBI_HOME="/home/hamid/workspace/gurobi/gurobi1003/linux64"
+export PATH="/home/hamid/workspace/gurobi/gurobi1003/linux64/bin:$PATH"
+export LD_LIBRARY_PATH="$GUROBI_HOME/lib:$LD_LIBRARY_PATH"
+export PATH="/home/hamid/workspace/gurobi/gurobi1003/linux64/include:$PATH"
+
+cd /home/hamid/workspace/prefetch/repo/dyssect/
+taskset -c 10 /home/hamid/workspace/prefetch/repo/dyssect/solver
+
+%dyssect:script@nf sudo=true
+
+cp dyssect-dynamic.click /home/hamid/workspace/prefetch/repo/dyssect/
+cd /home/hamid/workspace/prefetch/repo/dyssect/
+$GDB bin/click --dpdk -l 0-15 -- dyssect-dynamic.click
+
+%dyssect:file@nf dyssect-dynamic.click
+
+define (
+	$PORT			1,
+	$BURST			64,
+	$NDESC_IN		2048,
+	$NDESC_OUT		2048,
+	$SHARDS			32,
+	$SFC_LENGTH		1,
+	$W              16,
+	$E              0,
+    $SLOp			1000,
+	$SLOr			4000,
+	$SOLVER			$ENABLESOLVER,
+	$WCSOLVER		$ENABLESOLVER
+)
+
+controller :: DyssectController(
+	PORT			$PORT,
+	NDESC_IN		$NDESC_IN,
+	NDESC_OUT		$NDESC_OUT,
+	SHARDS			$SHARDS,
+	SFC_LENGTH		$SFC_LENGTH,
+	W			$W,
+	E			$E,
+	SLOp			$SLOp,
+	SLOr			$SLOr,
+	SOLVER			$SOLVER,
+)
+StaticThreadSched(controller 16)
+
+w0 :: DyssectWorkingCore(
+	PORT			$PORT,
+	QUEUE			0,
+	BURST			$BURST,
+	SOLVER			$WCSOLVER
+)
+w1 :: DyssectWorkingCore(
+	PORT			$PORT,
+	QUEUE			1,
+	BURST			$BURST,
+	SOLVER          $WCSOLVER
+)
+w2 :: DyssectWorkingCore(
+	PORT			$PORT,
+	QUEUE			2,
+	BURST			$BURST,
+	SOLVER          $WCSOLVER
+)
+w3 :: DyssectWorkingCore(
+	PORT			$PORT,
+	QUEUE			3,
+	BURST			$BURST,
+	SOLVER          $WCSOLVER
+)
+w4 :: DyssectWorkingCore(
+	PORT			$PORT,
+	QUEUE			4,
+	BURST			$BURST,
+	SOLVER          $WCSOLVER
+)
+w5 :: DyssectWorkingCore(
+	PORT			$PORT,
+	QUEUE			5,
+	BURST			$BURST,
+	SOLVER          $WCSOLVER
+)
+w6 :: DyssectWorkingCore(
+	PORT			$PORT,
+	QUEUE			6,
+	BURST			$BURST,
+	SOLVER          $WCSOLVER
+)
+
+w7 :: DyssectWorkingCore(
+    PORT                $PORT,
+    QUEUE               7,
+    BURST               $BURST,
+	SOLVER              $WCSOLVER
+)
+
+w8 :: DyssectWorkingCore(
+    PORT                $PORT,
+    QUEUE               8,
+    BURST               $BURST,
+	SOLVER              $WCSOLVER
+)
+
+w9 :: DyssectWorkingCore(
+    PORT                $PORT,
+    QUEUE               9,
+    BURST               $BURST,
+	SOLVER              $WCSOLVER
+)
+
+w10 :: DyssectWorkingCore(
+    PORT                $PORT,
+    QUEUE               10,
+    BURST               $BURST,
+	SOLVER              $WCSOLVER
+)
+
+w11 :: DyssectWorkingCore(
+    PORT                $PORT,
+    QUEUE               11,
+    BURST               $BURST,
+	SOLVER              $WCSOLVER
+)
+
+w12 :: DyssectWorkingCore(
+    PORT                $PORT,
+    QUEUE               12,
+    BURST               $BURST,
+	SOLVER              $WCSOLVER
+)
+
+w13 :: DyssectWorkingCore(
+    PORT                $PORT,
+    QUEUE               13,
+    BURST               $BURST,
+	SOLVER              $WCSOLVER
+)
+
+w14 :: DyssectWorkingCore(
+    PORT                $PORT,
+    QUEUE               14,
+    BURST               $BURST,
+	SOLVER              $WCSOLVER
+)
+
+w15 :: DyssectWorkingCore(
+    PORT                $PORT,
+    QUEUE               15,
+    BURST               $BURST,
+	SOLVER              $WCSOLVER
+)
+
+StaticThreadSched(w0 0)
+StaticThreadSched(w1 1)
+StaticThreadSched(w2 2)
+StaticThreadSched(w3 3)
+StaticThreadSched(w4 4)
+StaticThreadSched(w5 5)
+StaticThreadSched(w6 6)
+StaticThreadSched(w7 7)
+StaticThreadSched(w8 8)
+StaticThreadSched(w9 9)
+StaticThreadSched(w10 10)
+StaticThreadSched(w11 11)
+StaticThreadSched(w12 12)
+StaticThreadSched(w13 13)
+StaticThreadSched(w14 14)
+StaticThreadSched(w15 15)
+
+w0 ->
+	DyNAPT(HANDLE 0) ->
+	DyNAPT(HANDLE 1) ->
+    DyNAPT(HANDLE 2) ->
+//	DyIDS(HANDLE 1, OFFSET 0) ->
+	EtherMirror() -> 
+	DyssectQueueOut(PORT $PORT, QUEUE 0, BURST $BURST)
+w1 ->
+	DyNAPT(HANDLE 0) ->
+	DyNAPT(HANDLE 1) ->
+    DyNAPT(HANDLE 2) ->
+//	DyIDS(HANDLE 1, OFFSET 0) ->
+	EtherMirror() -> 
+	DyssectQueueOut(PORT $PORT, QUEUE 1, BURST $BURST)
+w2 -> 
+	DyNAPT(HANDLE 0) ->
+	DyNAPT(HANDLE 1) ->
+    DyNAPT(HANDLE 2) ->
+//	DyIDS(HANDLE 1, OFFSET 0) ->
+	EtherMirror() -> 
+	DyssectQueueOut(PORT $PORT, QUEUE 2, BURST $BURST)
+w3 -> 
+	DyNAPT(HANDLE 0) ->
+	DyNAPT(HANDLE 1) ->
+    DyNAPT(HANDLE 2) ->
+//	DyIDS(HANDLE 1, OFFSET 0) ->
+	EtherMirror() -> 
+	DyssectQueueOut(PORT $PORT, QUEUE 3, BURST $BURST)
+w4 -> 
+	DyNAPT(HANDLE 0) ->
+	DyNAPT(HANDLE 1) ->
+    DyNAPT(HANDLE 2) ->
+//	DyIDS(HANDLE 1, OFFSET 0) ->
+	EtherMirror() -> 
+	DyssectQueueOut(PORT $PORT, QUEUE 4, BURST $BURST)
+w5 ->
+	DyNAPT(HANDLE 0) ->
+	DyNAPT(HANDLE 1) ->
+    DyNAPT(HANDLE 2) ->
+//	DyIDS(HANDLE 1, OFFSET 0) ->
+	EtherMirror() -> 
+	DyssectQueueOut(PORT $PORT, QUEUE 5, BURST $BURST)
+w6 ->
+	DyNAPT(HANDLE 0) ->
+	DyNAPT(HANDLE 1) ->
+    DyNAPT(HANDLE 2) ->
+//	DyIDS(HANDLE 1, OFFSET 0) ->
+	EtherMirror() -> 
+	DyssectQueueOut(PORT $PORT, QUEUE 6, BURST $BURST)
+
+w7 ->
+    DyNAPT(HANDLE 0) ->
+	DyNAPT(HANDLE 1) ->
+    DyNAPT(HANDLE 2) ->
+//	DyIDS(HANDLE 1, OFFSET 0) ->
+        EtherMirror() ->
+        DyssectQueueOut(PORT $PORT, QUEUE 7, BURST $BURST)
+
+w8 ->
+    DyNAPT(HANDLE 0) ->
+	DyNAPT(HANDLE 1) ->
+    DyNAPT(HANDLE 2) ->
+//	DyIDS(HANDLE 1, OFFSET 0) ->
+        EtherMirror() ->
+        DyssectQueueOut(PORT $PORT, QUEUE 8, BURST $BURST)
+
+w9 ->
+    DyNAPT(HANDLE 0) ->
+	DyNAPT(HANDLE 1) ->
+    DyNAPT(HANDLE 2) ->
+//	DyIDS(HANDLE 1, OFFSET 0) ->
+        EtherMirror() ->
+        DyssectQueueOut(PORT $PORT, QUEUE 9, BURST $BURST)
+
+w10 ->
+    DyNAPT(HANDLE 0) ->
+	DyNAPT(HANDLE 1) ->
+    DyNAPT(HANDLE 2) ->
+//	DyIDS(HANDLE 1, OFFSET 0) ->
+        EtherMirror() ->
+        DyssectQueueOut(PORT $PORT, QUEUE 10, BURST $BURST)
+
+w11 ->
+    DyNAPT(HANDLE 0) ->
+	DyNAPT(HANDLE 1) ->
+    DyNAPT(HANDLE 2) ->
+//	DyIDS(HANDLE 1, OFFSET 0) ->
+        EtherMirror() ->
+        DyssectQueueOut(PORT $PORT, QUEUE 11, BURST $BURST)
+
+w12 ->
+    DyNAPT(HANDLE 0) ->
+	DyNAPT(HANDLE 1) ->
+    DyNAPT(HANDLE 2) ->
+//	DyIDS(HANDLE 1, OFFSET 0) ->
+        EtherMirror() ->
+        DyssectQueueOut(PORT $PORT, QUEUE 12, BURST $BURST)
+
+w13 ->
+    DyNAPT(HANDLE 0) ->
+	DyNAPT(HANDLE 1) ->
+    DyNAPT(HANDLE 2) ->
+//	DyIDS(HANDLE 1, OFFSET 0) ->
+        EtherMirror() ->
+        DyssectQueueOut(PORT $PORT, QUEUE 13, BURST $BURST)
+
+w14 ->
+    DyNAPT(HANDLE 0) ->
+	DyNAPT(HANDLE 1) ->
+    DyNAPT(HANDLE 2) ->
+//	DyIDS(HANDLE 1, OFFSET 0) ->
+        EtherMirror() ->
+        DyssectQueueOut(PORT $PORT, QUEUE 14, BURST $BURST)
+
+w15 ->
+    DyNAPT(HANDLE 0) ->
+	DyNAPT(HANDLE 1) ->
+    DyNAPT(HANDLE 2) ->
+//	DyIDS(HANDLE 1, OFFSET 0) ->
+        EtherMirror() ->
+        DyssectQueueOut(PORT $PORT, QUEUE 15, BURST $BURST)
+
+Script(TYPE ACTIVE,
+	set use 0,
+        label loop,
+		set t $(now),
+        set nuse $(add $(useful_kcycles)),
+        set diff $(sub $nuse $use),
+        set use $nuse,
+
+	set npkts0 $(w0.xstats rx_q0_packets),
+        set cdiff0 $(sub $npkts0 $pkts0),
+        set pkts0 $npkts0,
+
+        set npkts1 $(w1.xstats rx_q1_packets),
+        set cdiff1 $(sub $npkts1 $pkts1),
+        set pkts1 $npkts1,
+
+        set npkts2 $(w2.xstats rx_q2_packets),
+        set cdiff2 $(sub $npkts2 $pkts2),
+        set pkts2 $npkts2,
+
+        set npkts3 $(w3.xstats rx_q3_packets),
+        set cdiff3 $(sub $npkts3 $pkts3),
+        set pkts3 $npkts3,
+
+        set npkts4 $(w4.xstats rx_q4_packets),
+        set cdiff4 $(sub $npkts4 $pkts4),
+        set pkts4 $npkts4,
+
+        set npkts5 $(w5.xstats rx_q5_packets),
+        set cdiff5 $(sub $npkts5 $pkts5),
+        set pkts5 $npkts5,
+
+        set npkts6 $(w6.xstats rx_q6_packets),
+        set cdiff6 $(sub $npkts6 $pkts6),
+        set pkts6 $npkts6,
+
+        set npkts7 $(w7.xstats rx_q7_packets),
+        set cdiff7 $(sub $npkts7 $pkts7),
+        set pkts7 $npkts7,
+
+        set pktsmin $(min $cdiff0 $cdiff1 $cdiff2 $cdiff3 $cdiff4 $cdiff5 $cdiff6),
+		goto skipimbalance $(eq $pktsmin 0),
+        set pktsmax $(max $cdiff0 $cdiff1 $cdiff2 $cdiff3 $cdiff4 $cdiff5 $cdiff6),
+        set pktimbalance $(div $pktsmax $pktsmin),
+
+        print "PKTS "$cdiff0 $cdiff1 $cdiff2 $cdiff3 $cdiff4 $cdiff5 $cdiff6,
+        print "NF-$t-RESULT-IMBALANCE " $(mul $pktimbalance 100),
+		print "NF-$t-RESULT-IMBALANCECYCLES " $(load_imbalance),
+		label skipimbalance,
+
+        read load,
+	wait 0.5s,
+        gotoa loop);
+
+DriverManager(
+                read w0.rss_reta,
+                wait,
+                read w0.xstats,
+                print "RESULT-NFPHYCOUNT "$(w0.xstats rx_phy_packets),
+                print "RESULT-NFPHYDROPPED "$(w0.xstats rx_phy_discard_packets),
+                print "RESULT-SERVERDROPRATE "$(sub 1 $(div $(w0.xstats tx_phy_packets) $(w0.xstats rx_phy_packets)) )
+                print "END"
+);
+
+
+
+// **************** FASTCLICK SCRIPTS ****************** //
+
+%-vpp,-dyssect:script@nf sudo=true
+cp nf-dynamic.click $NF_CLICK_DIR
+cd $NF_CLICK_DIR
+$GDB ./bin/$NF_BIN --dpdk -l 0-15 -- nf-dynamic.click
+
+
+//NF configuration file
+%file@nf nf-dynamic.click
+DPDKInfo(15524285)
+JiffieClock
+
+define($nfport ${nf:0:pci})
+
+fd0 :: FromDPDKDevice($nfport, SCALE $SCALE, PROMISC true, PAUSE none, MAXTHREADS $NF_CPU, N_QUEUES 16, NUMA 1, VERBOSE 99, NDESC $NF_NDESC, BURST $RCV_BURST, RSS_AGGREGATE true)
+    -> Classifier(12/0800)
+    -> MarkIPHeader(OFFSET 14)
+
+$(( "    -> man :: $MANAGER(VERBOSE 0, CACHE 0, CAPACITY $CAPA) -> FlowIPLoadBalancer(VIP 10.0.0.100, DST 10.0.0.1, DST 10.0.0.2, DST 10.0.0.3)" if "$NFCOUNT" == "lb" else "" ))
+$(( "    -> man :: $MANAGER(VERBOSE 0, CACHE 0, CAPACITY $CAPA) -> FlowCounter" if "$NFCOUNT" == "one" else "" ))
+$(( "    -> man :: $MANAGER(VERBOSE 0, CACHE 0, CAPACITY $CAPA) -> FlowCounter -> FlowIPLoadBalancer(VIP 10.0.0.100, DST 10.0.0.1, DST 10.0.0.2, DST 10.0.0.3)" if "$NFCOUNT" == "two" else "" ))
+$(( "    -> man :: $MANAGER(VERBOSE 0, CACHE 0, CAPACITY $CAPA) -> FlowCounter -> FlowIPLoadBalancer(VIP 10.0.0.100, DST 10.0.0.1, DST 10.0.0.2, DST 10.0.0.3) -> FlowRateLimiter(RATE 1000000)" if "$NFCOUNT" == "three" else "" ))
+$(( "    -> man :: $MANAGER(VERBOSE 0, CACHE 0, CAPACITY $CAPA) -> FlowIPLoadBalancer(VIP 10.0.0.100, DST 10.0.0.1, DST 10.0.0.2, DST 10.0.0.3) -> sc :: SourceCounter(CAPACITY 67108864, ISSRC 1, CACHE $AUX) -> dc :: SourceCounter(CAPACITY 67108864, ISSRC 0, CACHE $AUX)" if "$NFCOUNT" == "sharefajita" else "" ))
+$(( "    -> sc :: SourceCounter(CAPACITY 67108864, ISSRC 1, CACHE $AUX) -> dc :: SourceCounter(CAPACITY 67108864, ISSRC 0, CACHE $AUX) -> man :: $MANAGER(VERBOSE 0, CACHE 0, CAPACITY $CAPA) -> FlowIPLoadBalancer(VIP 10.0.0.100, DST 10.0.0.1, DST 10.0.0.2, DST 10.0.0.3)" if "$NFCOUNT" == "sharefc" else "" ))
+
+$(( "    -> MinBatch($RCV_BURST)" if "$MINBATCH" == "TRUE" else "" ))
+
+    -> EtherMirror
+    -> td0 :: ToDPDKDevice($nfport, VERBOSE 99, TIMEOUT -1, BLOCKING false, IQUEUE 4096);
+
+
+//Script that runs every seconds
+Script(TYPE ACTIVE,
+        set use 0,
+        label loop,
+        set t $(now),
+        read load,
+        write c.reset,
+        wait 1s,
+        gotoa loop);
+
+//Script that runs at the end of the experiment
+DriverManager(
+                read fd0.rss_reta,
+                wait,
+                read fd0.xstats,
+                print "RESULT-NFFLOWS "$(man.count),
+                print "RESULT-NFRXCOUNT "$(fd0.hw_count),
+//                print "RESULT-NFPHYCOUNT "$(fd0.xstats rx_phy_packets),
+//                print "RESULT-NFPHYDROPPED "$(fd0.xstats rx_phy_discard_packets),
+//                print "RESULT-NFRXDROPPED "$(fd0.hw_dropped),
+//                print "RESULT-NFTWCOUNT "$(td0.hw_count),
+//                print "RESULT-NFCYCLESPP "$(div $(mul $(add $(useful_kcycles)) 1000) $(fd0.count)),
+                print "RESULT-SERVERDROPRATE "$(sub 1 $(div $(fd0.xstats tx_phy_packets) $(fd0.xstats rx_phy_packets)) ),
+                print "END"
+);
+
+// **************** EXTRA COMPUTATION ****************** //
+
+%pyexit
+import numpy as np
+from itertools import dropwhile,takewhile
+
+total={}
+for kind,aresults in KIND_RESULTS.items():
+    fs=set()
+    for time,results in aresults.items():
+        first=False
+        for kind,result in results.items():
+            t=kind[1:]
+            if t in total:
+                total[kind[1:]].append(result)
+            else:
+                total[t] = []
+                fs.add(time)
+    for f in fs:
+        del aresults[f]
+
+for k,vs in total.items():
+    med = np.mean(vs)
+#    print(k,vs,med)
+    fil=dropwhile(lambda x: x<med/2, vs)
+
+    fil=takewhile(lambda x: x>med/2, fil)
+    RESULTS[k] = list(fil)[1:-1]
+#    print(RESULTS[k,fil])
+
+if 'RX' in RESULTS and 'TX' in RESULTS:
+    RESULTS['FWDROP'] = np.mean(RESULTS['TX']) - np.mean(RESULTS['RX'])
+
+if 'TOTAL-LLC-LOADS' in RESULTS and 'NFRXCOUNT' in RESULTS:
+        RESULTS['NFLLCLOADSPP'] = [np.mean(np.array(RESULTS['TOTAL-LLC-LOADS'])) / (np.mean(np.array(RESULTS['NFRXCOUNT'])) ) ]
+if 'TOTAL-LLC-MISSES' in RESULTS and 'NFRXCOUNT' in RESULTS:
+        RESULTS['NFLLCMISSESPP'] = [np.mean(np.array(RESULTS['TOTAL-LLC-MISSES'])) / (np.mean(np.array(RESULTS['NFRXCOUNT'])) ) ]
+
+//Compute derivate results
+// %pypost
+// import numpy as np
+
+// for run, RESULTS in ALL_RESULTS.items():
+//    if 'TOTAL-LLC-LOADS' in RESULTS:
+//        RESULTS['NFLLCLOADSPP'] = [np.mean(np.array(RESULTS['TOTAL-LLC-LOADS'])) / (np.mean(np.array(RESULTS['NFRXCOUNT'])) ) ]
+//    if 'TOTAL-LLC-MISSES' in RESULTS:
+//        RESULTS['NFLLCMISSESPP'] = [np.mean(np.array(RESULTS['TOTAL-LLC-MISSES'])) / (np.mean(np.array(RESULTS['NFRXCOUNT'])) ) ]
+
+
+//Just to get nice graphs
+%import graph-beautiful
