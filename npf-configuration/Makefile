@@ -116,3 +116,19 @@ workload-var:
 		--force-retest \
 		--tags promisc three gen_nolat \
 		--variables NF_CPU=8 GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR}
+
+statefulness-impact:
+		python3 ${NPF_DIR}/npf_compare.py \
+		"local+test:fajita" \
+		"local+test,freshfc,min_batch:fastclick" \
+		--npf ${MAIN_DIR}experiments/scalability/scalability.npf \
+		--cluster ${NPF_CLUSTER} \
+		--show-all --show-files --no-build --no-build-deps fastclick fastclick-light \
+		--graph-filename statefulness/statefulness.pdf \
+		--output ${OUTPUT_COLUMNS} \
+		--show-cmd --config "var_format={result:%.02f}" \
+		--config n_runs=1 \
+		--graph-size 5 2.5 \
+		--force-retest \
+		--tags promisc one synthetic perf gen_nolat flowsvar\
+		--variables NF_CPU=8 GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR}
