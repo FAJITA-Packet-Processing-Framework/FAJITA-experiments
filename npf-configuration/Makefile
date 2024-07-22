@@ -10,20 +10,21 @@ NPF_DIR?=/home/hamid/npf/npf
 MAIN_DIR := $(dir $(CURDIR:%/=%))
 
 CORES?=8
+N_RUNS?=1
 
 
 various_offered_load:
 		python3 ${NPF_DIR}/npf_compare.py \
-		"local+test,freshfc,min_batch:fastclick" \
-		"local+test:fajita" \
-		"local+test,vpp:vpp" \
+		"local+test:Fajita" \
+		"local+test,freshfc,min_batch:FastClick" \
+		"local+test,vpp:VPP" \
 		--npf ${MAIN_DIR}experiments/offered-load-var/compare-all.npf \
 		--cluster ${NPF_CLUSTER} \
 		--show-all --show-files --no-build --no-build-deps fastclick fastclick-light \
 		--graph-filename various-offered-load/various-offered-load.pdf \
 		--output ${OUTPUT_COLUMNS} \
 		--show-cmd --config "var_format={result:%.02f}" \
-		--config n_runs=1 \
+		--config n_runs=${N_RUNS} \
 		--graph-size 5 2.5 \
 		--force-retest \
 		--tags promisc two ratevar \
@@ -31,9 +32,9 @@ various_offered_load:
 
 various_packet_size:
 		python3 ${NPF_DIR}/npf_compare.py \
-		"local+test:fajita" \
-		"local+test,freshfc,min_batch:fastclick" \
-		"local+test,vpp:vpp" \
+		"local+test:Fajita" \
+		"local+test,freshfc,min_batch:FastClick" \
+		"local+test,vpp:VPP" \
 		--npf ${MAIN_DIR}experiments/packet-size-var/packet-size-var.npf \
 		--cluster ${NPF_CLUSTER} \
 		--show-all --show-files --no-build --no-build-deps fastclick fastclick-light \
@@ -48,9 +49,9 @@ various_packet_size:
 
 scalability-1NF:
 		python3 ${NPF_DIR}/npf_compare.py \
-		"local+test:fajita" \
-		"local+test,freshfc,min_batch:fastclick" \
-		"local+test,vpp:vpp" \
+		"local+test:Fajita" \
+		"local+test,freshfc,min_batch:FastClick" \
+		"local+test,vpp:VPP" \
 		--npf ${MAIN_DIR}experiments/scalability/scalability.npf \
 		--cluster ${NPF_CLUSTER} \
 		--show-all --show-files --no-build --no-build-deps fastclick fastclick-light \
@@ -65,9 +66,9 @@ scalability-1NF:
 
 scalability-2NFs:
 		python3 ${NPF_DIR}/npf_compare.py \
-		"local+test:fajita" \
-		"local+test,freshfc,min_batch:fastclick" \
-		"local+test,vpp:vpp" \
+		"local+test:Fajita" \
+		"local+test,freshfc,min_batch:FastClick" \
+		"local+test,vpp:VPP" \
 		--npf ${MAIN_DIR}experiments/scalability/scalability.npf \
 		--cluster ${NPF_CLUSTER} \
 		--show-all --show-files --no-build --no-build-deps fastclick fastclick-light \
@@ -82,9 +83,9 @@ scalability-2NFs:
 
 scalability-3NFs:
 		python3 ${NPF_DIR}/npf_compare.py \
-		"local+test:fajita" \
-		"local+test,freshfc,min_batch:fastclick" \
-		"local+test,vpp:vpp" \
+		"local+test:Fajita" \
+		"local+test,freshfc,min_batch:FastClick" \
+		"local+test,vpp:VPP" \
 		--npf ${MAIN_DIR}experiments/scalability/scalability.npf \
 		--cluster ${NPF_CLUSTER} \
 		--show-all --show-files --no-build --no-build-deps fastclick fastclick-light \
@@ -99,12 +100,12 @@ scalability-3NFs:
 
 workload-var:
 		python3 ${NPF_DIR}/npf_compare.py \
-		"local+test:fajita-caida" \
-		"local+test,freshfc,min_batch:fastclick-caida" \
-		"local+test,vpp:vpp-caida" \
-		"local+test,synthetic:fajita-synthetic" \
-		"local+test,freshfc,min_batch,synthetic:fastclick-synthetic" \
-		"local+test,vpp,synthetic:vpp-synthetic" \
+		"local+test:Fajita-caida" \
+		"local+test,freshfc,min_batch:FastClick-caida" \
+		"local+test,vpp:VPP-caida" \
+		"local+test,synthetic:Fajita-synthetic" \
+		"local+test,freshfc,min_batch,synthetic:FastClick-synthetic" \
+		"local+test,vpp,synthetic:VPP-synthetic" \
 		--npf ${MAIN_DIR}experiments/scalability/scalability.npf \
 		--cluster ${NPF_CLUSTER} \
 		--show-all --show-files --no-build --no-build-deps fastclick fastclick-light \
@@ -119,8 +120,8 @@ workload-var:
 
 statefulness-impact:
 		python3 ${NPF_DIR}/npf_compare.py \
-		"local+test:fajita" \
-		"local+test,freshfc,min_batch:fastclick" \
+		"local+test:Fajita" \
+		"local+test,freshfc,min_batch:FastClick" \
 		--npf ${MAIN_DIR}experiments/scalability/scalability.npf \
 		--cluster ${NPF_CLUSTER} \
 		--show-all --show-files --no-build --no-build-deps fastclick fastclick-light \
@@ -135,14 +136,14 @@ statefulness-impact:
 
 auxiliary-ht:
 		python3 ${NPF_DIR}/npf_compare.py \
-		"local+test,aux:fajita-with-aux-ht" \
-		"local+test:fajita-without-aux-ht" \
-		"local+test,freshfc,min_batch:fastclick" \
+		"local+test,aux:Fajita-with-AUX-HT" \
+		"local+test:Fajita-without-AUT-HT" \
+		"local+test,freshfc,min_batch:FastClick" \
 		"local+test,vpp:vpp" \
 		--npf ${MAIN_DIR}experiments/scalability/scalability.npf \
 		--cluster ${NPF_CLUSTER} \
 		--show-all --show-files --no-build --no-build-deps fastclick fastclick-light \
-		--graph-filename auxiliary/auxiliary.pdf \
+		--graph-filename q/auxiliary.pdf \
 		--output ${OUTPUT_COLUMNS} \
 		--show-cmd --config "var_format={result:%.02f}" \
 		--config n_runs=1 \
@@ -150,4 +151,36 @@ auxiliary-ht:
 		--force-retest \
 		--tags promisc share synthetic gen_nolat coresvar \
 		--variables GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR}
-	
+
+dyssect-compare:
+		python3 ${NPF_DIR}/npf_compare.py \
+		"local+test,lb:Fajita" \
+		"local+test,dyssect:Dyssect - w/o solver" \
+		"local+test,dyssect,solver:Dyssect - w/ solver" \
+		--npf ${MAIN_DIR}experiments/imbalance-impact/dyssect-compare.npf \
+		--cluster ${NPF_CLUSTER} \
+		--show-all --show-files --no-build --no-build-deps fastclick fastclick-light \
+		--graph-filename imbalance/dyssect-compare.pdf \
+		--output ${OUTPUT_COLUMNS} \
+		--show-cmd --config "var_format={result:%.02f}" \
+		--config n_runs=1 \
+		--graph-size 5 2.5 \
+		--force-retest \
+		--tags promisc timing coresvar \
+		--variables GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR}
+
+imbalance-impact:
+		python3 ${NPF_DIR}/npf_compare.py \
+		"local+test,lb:Fajita" \
+		"local+test,dyssect,solver:Dyssect - w/ solver" \
+		--npf ${MAIN_DIR}experiments/imbalance-impact/dyssect-compare.npf \
+		--cluster ${NPF_CLUSTER} \
+		--show-all --show-files --no-build --no-build-deps fastclick fastclick-light \
+		--graph-filename imbalance/dyssect-compare.pdf \
+		--output ${OUTPUT_COLUMNS} \
+		--show-cmd --config "var_format={result:%.02f}" \
+		--config n_runs=1 \
+		--graph-size 5 2.5 \
+		--force-retest \
+		--tags promisc synthetic \
+		--variables GEN_THREADS=4 NF_CPU=8 GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR}
