@@ -144,9 +144,9 @@ echo "EVENT VPP_KILLED!"
 
 %vpp:script@nf sudo=true autokill=false background=true
 cd $VPP_INSTALL_DIR
-sed -i "s/corelist-workers 1-[0-9]*/corelist-workers 1-$VPP_MAX_CORE/" ../exp-startup.conf
+sed -i "s/corelist-workers 1-[0-9]*/corelist-workers 1-$VPP_MAX_CORE/" exp-startup.conf
 echo "EVENT VPP_START"
-sudo ./build-root/install-vpp-native/vpp/bin/vpp -c ../exp-startup.conf
+sudo ./build-root/install-vpp-native/vpp/bin/vpp -c exp-startup.conf
 
 // ****************** VPP SCRIPTS ******************** //
 

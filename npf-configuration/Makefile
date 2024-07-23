@@ -3,15 +3,14 @@ SHELL := /bin/bash
 NPF_CLUSTER?=nf=nslrack35 client=nslrack16,nic=1 tofino=tofino2 
 OUTPUT_COLUMNS?=--output-columns x min perc1 perc20 median perc80 perc99 max avg --no-graph-time
 
-FAJITA_CLICK_DIR?=/home/hamid/workspace/prefetch/repo/rack35/fajita/fastclick/
+FAJITA_CLICK_DIR?=/home/hamid/workspace/fajita-artifact/FAJITA/
 FASTCLICK_CLICK_DIR?=/home/hamid/workspace/prefetch/repo/rack35/fastclick/
-VPP_INSTALL_DIR?=/home/hamid/workspace/prefetch/repo/vpp-customized/vpp/
+VPP_INSTALL_DIR?=/home/hamid/workspace/fajita-artifact/custom-vpp/
 NPF_DIR?=/home/hamid/npf/npf
 MAIN_DIR := $(dir $(CURDIR:%/=%))
 
 CORES?=8
 N_RUNS?=1
-
 
 various_offered_load:
 		python3 ${NPF_DIR}/npf_compare.py \
