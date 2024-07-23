@@ -4,16 +4,16 @@ NPF_CLUSTER?=nf=nslrack35 client=nslrack16,nic=1 tofino=tofino2
 OUTPUT_COLUMNS?=--output-columns x min perc1 perc20 median perc80 perc99 max avg --no-graph-time
 
 FAJITA_CLICK_DIR?=/home/hamid/workspace/fajita-artifact/FAJITA/
-FASTCLICK_CLICK_DIR?=/home/hamid/workspace/prefetch/repo/rack35/fastclick/
+FASTCLICK_CLICK_DIR?=/home/hamid/workspace/fajita-artifact/fastclick/
 VPP_INSTALL_DIR?=/home/hamid/workspace/fajita-artifact/custom-vpp/
-NPF_DIR?=/home/hamid/npf/npf
+NPF_DIR?=/home/hamid/workspace/fajita-artifact/npf
 MAIN_DIR := $(dir $(CURDIR:%/=%))
 
 CORES?=8
 N_RUNS?=1
 
 various_offered_load:
-		python3 ${NPF_DIR}/npf_compare.py \
+		npf-compare.py \
 		"local+test:Fajita" \
 		"local+test,freshfc,min_batch:FastClick" \
 		"local+test,vpp:VPP" \
@@ -30,7 +30,7 @@ various_offered_load:
 		--variables FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR} NF_CPU=${CORES}
 
 various_packet_size:
-		python3 ${NPF_DIR}/npf_compare.py \
+		npf-compare.py \
 		"local+test:Fajita" \
 		"local+test,freshfc,min_batch:FastClick" \
 		"local+test,vpp:VPP" \
@@ -47,7 +47,7 @@ various_packet_size:
 		--variables NF_CPU=4 MAXLENGTH=1500 GEN_RATE=12000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR}
 
 scalability-1NF:
-		python3 ${NPF_DIR}/npf_compare.py \
+		npf-compare.py \
 		"local+test:Fajita" \
 		"local+test,freshfc,min_batch:FastClick" \
 		"local+test,vpp:VPP" \
@@ -64,7 +64,7 @@ scalability-1NF:
 		--variables GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR}
 
 scalability-2NFs:
-		python3 ${NPF_DIR}/npf_compare.py \
+		npf-compare.py \
 		"local+test:Fajita" \
 		"local+test,freshfc,min_batch:FastClick" \
 		"local+test,vpp:VPP" \
@@ -81,7 +81,7 @@ scalability-2NFs:
 		--variables GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR}
 
 scalability-3NFs:
-		python3 ${NPF_DIR}/npf_compare.py \
+		npf-compare.py \
 		"local+test:Fajita" \
 		"local+test,freshfc,min_batch:FastClick" \
 		"local+test,vpp:VPP" \
@@ -98,7 +98,7 @@ scalability-3NFs:
 		--variables GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR}
 
 workload-var:
-		python3 ${NPF_DIR}/npf_compare.py \
+		npf-compare.py \
 		"local+test:Fajita-caida" \
 		"local+test,freshfc,min_batch:FastClick-caida" \
 		"local+test,vpp:VPP-caida" \
@@ -118,7 +118,7 @@ workload-var:
 		--variables NF_CPU=8 GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR}
 
 statefulness-impact:
-		python3 ${NPF_DIR}/npf_compare.py \
+		npf-compare.py \
 		"local+test:Fajita" \
 		"local+test,freshfc,min_batch:FastClick" \
 		--npf ${MAIN_DIR}experiments/scalability/scalability.npf \
@@ -134,7 +134,7 @@ statefulness-impact:
 		--variables NF_CPU=8 GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR}
 
 auxiliary-ht:
-		python3 ${NPF_DIR}/npf_compare.py \
+		npf-compare.py \
 		"local+test,aux:Fajita-with-AUX-HT" \
 		"local+test:Fajita-without-AUT-HT" \
 		"local+test,freshfc,min_batch:FastClick" \
@@ -152,7 +152,7 @@ auxiliary-ht:
 		--variables GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR}
 
 dyssect-compare:
-		python3 ${NPF_DIR}/npf_compare.py \
+		npf-compare.py \
 		"local+test,lb:Fajita" \
 		"local+test,dyssect:Dyssect - w/o solver" \
 		"local+test,dyssect,solver:Dyssect - w/ solver" \
@@ -169,7 +169,7 @@ dyssect-compare:
 		--variables GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR}
 
 imbalance-impact:
-		python3 ${NPF_DIR}/npf_compare.py \
+		npf-compare.py \
 		"local+test,lb:Fajita" \
 		"local+test,dyssect,solver:Dyssect - w/ solver" \
 		--npf ${MAIN_DIR}experiments/imbalance-impact/dyssect-compare.npf \

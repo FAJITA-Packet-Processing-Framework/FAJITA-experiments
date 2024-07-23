@@ -6,7 +6,7 @@ This repository contains instructions for using FAJITA and running experiments t
 
 ## Repository Organization
 
-- `experiments` direcotry contains configuration files that you need to run all experiments discussed in the paper.
+- `experiments` direcotry contains configuration files and necessary information that you need to run all experiments discussed in the paper.
 
 - `graphs` directory contains all csv results and graphs that already presented in the paper. You can use the output csv of your experiments and use the provided [Gnuplot][Gnuplot] scripts to generate your graphs in the same style as the paper.
 
