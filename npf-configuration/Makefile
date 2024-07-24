@@ -6,7 +6,8 @@ OUTPUT_COLUMNS?=--output-columns x min perc1 perc20 median perc80 perc99 max avg
 FAJITA_CLICK_DIR?=/home/hamid/workspace/fajita-artifact/FAJITA/
 FASTCLICK_CLICK_DIR?=/home/hamid/workspace/fajita-artifact/fastclick/
 VPP_INSTALL_DIR?=/home/hamid/workspace/fajita-artifact/custom-vpp/
-NPF_DIR?=/home/hamid/workspace/fajita-artifact/npf
+SOLVER_DIR?=/home/hamid/workspace/prefetch/repo/dyssect/
+DYSSECT_DIR?=/home/hamid/workspace/prefetch/repo/dyssect/
 MAIN_DIR := $(dir $(CURDIR:%/=%))
 
 CORES?=8
@@ -166,7 +167,7 @@ dyssect-compare:
 		--graph-size 5 2.5 \
 		--force-retest \
 		--tags promisc timing coresvar \
-		--variables GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR}
+		--variables GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR} SOLVER_DIR=${SOLVER_DIR} DYSSECT_DIR=${DYSSECT_DIR}
 
 imbalance-impact:
 		npf-compare.py \
@@ -182,4 +183,4 @@ imbalance-impact:
 		--graph-size 5 2.5 \
 		--force-retest \
 		--tags promisc synthetic \
-		--variables GEN_THREADS=4 NF_CPU=8 GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR}
+		--variables GEN_THREADS=4 NF_CPU=8 GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR} SOLVER_DIR=${SOLVER_DIR} DYSSECT_DIR=${DYSSECT_DIR}

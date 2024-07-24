@@ -57,6 +57,9 @@ LIMIT_TIME=5
 GEN_BIN=click
 GEN_CLICK_DIR=/home/hamid/workspace/prefetch/repo/fastclick-gen2/fastclick/bin/
 
+GUROBI_BASE_DIR=/home/hamid/workspace/gurobi/gurobi1003/linux64
+SOLVER_DIR=/home/hamid/workspace/prefetch/repo/dyssect/
+DYSSECT_DIR=/home/hamid/workspace/prefetch/repo/dyssect/
 
 
 //...... WE NEED A DIFFERENT TRACE FILE THAN OTHER EXPERIMENTS AS WE SHOULD SEND WITH ACTUAL TIMING ......\\
@@ -186,18 +189,18 @@ echo "number of NFs in the chain is not determined! possible tag options : one, 
 // **************** Dyssect SCRIPTS ****************** //
 
 %solver,dyssect:script@nf
-export GUROBI_HOME="/home/hamid/workspace/gurobi/gurobi1003/linux64"
-export PATH="/home/hamid/workspace/gurobi/gurobi1003/linux64/bin:$PATH"
+export GUROBI_HOME="$GUROBI_BASE_DIR"
+export PATH="$GUROBI_BASE_DIR/bin:$PATH"
 export LD_LIBRARY_PATH="$GUROBI_HOME/lib:$LD_LIBRARY_PATH"
-export PATH="/home/hamid/workspace/gurobi/gurobi1003/linux64/include:$PATH"
+export PATH="$GUROBI_BASE_DIR/include:$PATH"
 
-cd /home/hamid/workspace/prefetch/repo/dyssect/
-taskset -c 10 /home/hamid/workspace/prefetch/repo/dyssect/solver
+cd $SOLVER_DIR
+taskset -c 10 ./solver
 
 %dyssect:script@nf sudo=true
 
-cp dyssect-dynamic.click /home/hamid/workspace/prefetch/repo/dyssect/
-cd /home/hamid/workspace/prefetch/repo/dyssect/
+cp dyssect-dynamic.click $DYSSECT_DIR
+cd $DYSSECT_DIR
 $GDB bin/click --dpdk -l 0-15 -- dyssect-dynamic.click
 
 %dyssect:file@nf dyssect-dynamic.click
