@@ -61,7 +61,7 @@ campus:trace=/mnt/traces/campus-split/ip_summary_tx_forcedudp/all-8combined_udp_
 
 
 //........ POSSIBLE TOFINO CONFIGURATIONS ........\\
-MCAST=1
+MCAST=4
 RECIRCULATE=1
 
 
@@ -122,7 +122,34 @@ avg:var_lim+={result-FRATE:0-40}
 
 // ****************** TOFINO SCRIPTS ******************** //
 
-%script@tofino background=true  autokill=false
+%-tofino2:script@tofino32 title=tofino-old background=true autokill=false
+export SDE=/home/tofino/bf-sde-9.8.0/
+export SDE_INSTALL=/home/tofino/bf-sde-9.8.0/install/
+killall -9 run_switchd.sh
+killall -9 run_bfshell.sh
+killall -9 bfshell
+killall -9 bf_switchd
+echo "EVENT TOFINOOLD_INIT"
+
+sed -i 's/N_MULTICAST = [0-9]*/N_MULTICAST = $MCAST/' /home/tofino/labs/FAJITA-Tofino-Multicast-P4/run_pd_rpc/setup.py
+sed -i 's/ENABLE_RECIRCULATION = [0-9]*/ENABLE_RECIRCULATION = $RECIRCULATE/' /home/tofino/labs/FAJITA-Tofino-Multicast-P4/setup.py
+
+$SDE/run_switchd.sh -p fajita_mcast
+echo "TOFINO FINISHED 32"
+
+%-tofino2:script@tofino32 title=tofino-old-setup waitfor=TOFINOOLD_INIT delay=5 background=true autokill=false
+echo "Tofino32 init"
+sleep 5
+export SDE=/home/tofino/bf-sde-9.8.0/
+export SDE_INSTALL=$SDE/install/
+echo "EVENT TOFINO_READY"
+echo "EVENT TOFINO_READY"
+echo "EVENT TOFINO_READY"
+
+$SDE/run_bfshell.sh -i -b /home/tofino/labs/FAJITA-Tofino-Multicast-P4/setup.py
+
+
+%tofino2:script@tofino background=true  autokill=false
 export SDE_INSTALL=/home/tofino/bf-sde-9.11.1/install
 export SDE=/home/tofino/bf-sde-9.11.1
 sudo killall -9 run_switchd.sh
@@ -132,11 +159,12 @@ sudo killall -9 bf_switchd
 echo "EVENT TOFINO_INIT"
 $SDE/run_switchd.sh --arch tf2 -p fajita_fwd
 
-%script@tofino waitfor=TOFINO_INIT delay=5
+%tofino2:script@tofino waitfor=TOFINO_INIT delay=5
 export SDE_INSTALL=/home/tofino/bf-sde-9.11.1/install
 export SDE=/home/tofino/bf-sde-9.11.1
 echo "EVENT TOFINO_READY"
 $SDE/run_bfshell.sh -i -b /home/tofino/labs/fajita-fwd/setup.py
+
 
 %init@nf sudo=true
 sudo killall vpp_main

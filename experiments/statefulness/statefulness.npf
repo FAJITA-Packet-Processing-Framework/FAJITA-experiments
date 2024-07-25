@@ -61,7 +61,7 @@ campus:trace=/mnt/traces/campus-split/ip_summary_tx_forcedudp/all-8combined_udp_
 
 
 //........ POSSIBLE TOFINO CONFIGURATIONS ........\\
-MCAST=1
+MCAST=4
 RECIRCULATE=1
 
 
@@ -83,7 +83,6 @@ gdb:GDB=gdb -ex run -ex "signal 2" -ex bt -batch -args
 SCALE=SHARE
 
 %late_variables
-TOTAL-FLOWS=EXPAND($(( $FLOWS * 8 )))
 VPP_MAX_CORE=EXPAND($(( (min(15,$NF_CPU) ) )))
 CAPA=EXPAND($(( int( $NF_CPU * 16000000 ) if $NF_CPU < 5 else 120000000 )))
 
@@ -100,15 +99,13 @@ LIMIT=100000000
 timeout=120
 accept_zero={NFRXDROPPED,.*DROPPED.*,NFPHYDROPPED,RX,C_BPS,C_PPS}
 var_unit={TX:bps,RX:bps,RXCOUNT: ,RATE:pps,LINKRATE:bps}
-var_name={NF_CPU: Available CPU Cores, GEN_LENGTH: Packet Size (B), NFTXPPS: Output throughput (MPPS),OFTXPPS: Input Rate (Mpps), OFRX: Throughput (Gbps), OFRXPPS: Throughput (Mpps),LAT50: Median latency (μs), LAT99:99th percentile latency (μs), GEN_RATE:Input Packet Rate (Mpps),CBPS_FIN:Output throughput (Gbps),C_BPS:Output throughput (Gbps),C_PPS:Output packet rate (Mpps),FRATE:NF packet rate (Mpps),GEN_LENGTH:Packet length (B),GEN_RATE_GBPS:Input Rate (Gbps),NFDROPPEDPC:Traffic dropped by NF (%),NF_S:Size of static data in memory (MB),NF_CPU:CPU cores on the NF,BENCHRES:CPU Copy memory bandwidth (MB/s)}
+var_name={NFLLCMISSESPP: Avg. LLC Misses / # of Cores, NF_CPU: Available CPU Cores, GEN_LENGTH: Packet Size (B), NFTXPPS: Output throughput (MPPS),OFTXPPS: Input Rate (Mpps), OFRX: Throughput (Gbps), OFRXPPS: Throughput (Mpps),LAT50: Median latency (μs), LAT99:99th percentile latency (μs), GEN_RATE:Input Packet Rate (Mpps),CBPS_FIN:Output throughput (Gbps),C_BPS:Output throughput (Gbps),C_PPS:Output packet rate (Mpps),FRATE:NF packet rate (Mpps),GEN_LENGTH:Packet length (B),GEN_RATE_GBPS:Input Rate (Gbps),NFDROPPEDPC:Traffic dropped by NF (%),NF_S:Size of static data in memory (MB),NF_CPU:CPU cores on the NF,BENCHRES:CPU Copy memory bandwidth (MB/s)}
 var_divider={OFRX:1000000000, OFRXPPS:1000000,OFTXPPS:1000000,GEN_RATE:250000,CBPS_FIN:1000000000,C_BPS:1000000000,FRATE:1000000,C_PPS:1000000,TOFRXPPS:1000000,NFTXPPS:1000000,GEN_RATE_GBPS:1,NFDROPPEDPC:0.01}
 // recirculate:var_divider={GEN_RATE:41666.666}
 var_format={GEN_RATE:%d,C_BPS:%d,FRATE:%d,NFDROPPEDPC:%d,CBPS_FIN:%d,C_PPS:%d,C_BPS:%d}
 nflim:n_runs=1
 var_lim={result-C_BPS:0-320, LATENCY:0-1000, LAT99:0-1000, LAT50:0-130, TOFRXPPS:0-50, NFTXPPS:0-14}
 avg:var_lim+={result-FRATE:0-40}
-
-graph_cross_reference={NFLLCMISSESPP:NFFLOWS, OFRXPPS:NFFLOWS}
 
 // ****************** CLIENT SCRIPTS ******************** //
 
@@ -125,7 +122,34 @@ graph_cross_reference={NFLLCMISSESPP:NFFLOWS, OFRXPPS:NFFLOWS}
 
 // ****************** TOFINO SCRIPTS ******************** //
 
-%script@tofino background=true  autokill=false
+%-tofino2:script@tofino32 title=tofino-old background=true autokill=false
+export SDE=/home/tofino/bf-sde-9.8.0/
+export SDE_INSTALL=/home/tofino/bf-sde-9.8.0/install/
+killall -9 run_switchd.sh
+killall -9 run_bfshell.sh
+killall -9 bfshell
+killall -9 bf_switchd
+echo "EVENT TOFINOOLD_INIT"
+
+sed -i 's/N_MULTICAST = [0-9]*/N_MULTICAST = $MCAST/' /home/tofino/labs/FAJITA-Tofino-Multicast-P4/run_pd_rpc/setup.py
+sed -i 's/ENABLE_RECIRCULATION = [0-9]*/ENABLE_RECIRCULATION = $RECIRCULATE/' /home/tofino/labs/FAJITA-Tofino-Multicast-P4/setup.py
+
+$SDE/run_switchd.sh -p fajita_mcast
+echo "TOFINO FINISHED 32"
+
+%-tofino2:script@tofino32 title=tofino-old-setup waitfor=TOFINOOLD_INIT delay=5 background=true autokill=false
+echo "Tofino32 init"
+sleep 5
+export SDE=/home/tofino/bf-sde-9.8.0/
+export SDE_INSTALL=$SDE/install/
+echo "EVENT TOFINO_READY"
+echo "EVENT TOFINO_READY"
+echo "EVENT TOFINO_READY"
+
+$SDE/run_bfshell.sh -i -b /home/tofino/labs/FAJITA-Tofino-Multicast-P4/setup.py
+
+
+%tofino2:script@tofino background=true  autokill=false
 export SDE_INSTALL=/home/tofino/bf-sde-9.11.1/install
 export SDE=/home/tofino/bf-sde-9.11.1
 sudo killall -9 run_switchd.sh
@@ -135,7 +159,7 @@ sudo killall -9 bf_switchd
 echo "EVENT TOFINO_INIT"
 $SDE/run_switchd.sh --arch tf2 -p fajita_fwd
 
-%script@tofino waitfor=TOFINO_INIT delay=5
+%tofino2:script@tofino waitfor=TOFINO_INIT delay=5
 export SDE_INSTALL=/home/tofino/bf-sde-9.11.1/install
 export SDE=/home/tofino/bf-sde-9.11.1
 echo "EVENT TOFINO_READY"
@@ -147,9 +171,9 @@ echo "EVENT VPP_KILLED!"
 
 %vpp:script@nf sudo=true autokill=false background=true
 cd $VPP_INSTALL_DIR
-sed -i "s/corelist-workers 1-[0-9]*/corelist-workers 1-$VPP_MAX_CORE/" ../exp-startup.conf
+sed -i "s/corelist-workers 1-[0-9]*/corelist-workers 1-$VPP_MAX_CORE/" exp-startup.conf
 echo "EVENT VPP_START"
-sudo ./build-root/install-vpp-native/vpp/bin/vpp -c ../exp-startup.conf
+sudo ./build-root/install-vpp-native/vpp/bin/vpp -c exp-startup.conf
 
 // ****************** VPP SCRIPTS ******************** //
 
