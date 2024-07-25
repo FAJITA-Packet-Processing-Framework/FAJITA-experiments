@@ -1,6 +1,15 @@
 #!/bin/sh
 
 cd ..
+
+echo "Building NPF ..."
+git clone https://github.com/tbarbette/npf.git npf
+cd npf
+python3 setup.py build
+chmod u+x ./build/lib/npf_compare.py
+echo "NPF build done ..."
+cd ..
+
 echo "Building DPDK v22.07..."
 git clone https://github.com/DPDK/dpdk.git
 cd dpdk
