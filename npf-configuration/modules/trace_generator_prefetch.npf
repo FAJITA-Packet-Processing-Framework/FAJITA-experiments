@@ -11,7 +11,7 @@ gdb:GEN_GDB=gdb -ex run -ex "signal 2" -ex "bt" -batch -args
 
 %script deps=fastclick sudo=true name=trace_generator
 // rm -rf /mnt/traces/synthetic/*
-$GEN_GDB /home/hamid/workspace/rdma/nf/fastclick/bin/click --dpdk -l 0-15 -- TRACEGEN_CONFIG
+$GEN_GDB ${GEN_CLICK_DIR}click --dpdk -l 0-15 -- TRACEGEN_CONFIG
 
 %file TRACEGEN_CONFIG
 d :: DPDKInfo(7000000)
