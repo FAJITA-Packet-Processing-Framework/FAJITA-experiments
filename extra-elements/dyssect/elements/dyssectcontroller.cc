@@ -246,7 +246,7 @@ void DyssectController::init_shards()
         hash_params.entries = HASH_TABLE_SIZE;
 
         hash_params.key_len = sizeof(DyssectFlow);
-        hash_params.hash_func = ipv4_hash_crc2;
+        hash_params.hash_func = ipv4_hash_crc;
         hash_params.hash_func_init_val = 0;
         hash_params.extra_flag = 0;
 
