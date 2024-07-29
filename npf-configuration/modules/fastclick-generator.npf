@@ -117,7 +117,7 @@ BROADCAST_IGNORE= -> c :: Classifier(-, 0/ffffffffffff)
 
 
 %script deps=fastclick sudo=true delay=2 name=fastclick-play
-cp PKTGEN_CONFIG /home/hamid/gentest.click
+// cp PKTGEN_CONFIG /home/hamid/gentest.click
 date +%s
 $GEN_GDB ${GEN_CLICK_DIR}click --dpdk -l 0-15 -- PKTGEN_CONFIG
 echo "EVENT TX_FINISHED"

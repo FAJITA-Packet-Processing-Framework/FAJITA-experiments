@@ -114,8 +114,8 @@ BROADCAST_IGNORE= -> c :: Classifier(-, 0/ffffffffffff)
 
 
 %script deps=fastclick sudo=true delay=2 name=fastclick-play
- cp PKTGEN_CONFIG /home/hamid/temp
-$GEN_GDB /home/hamid/workspace/prefetch/repo/fastclick-gen2/fastclick/bin/click --dpdk -l 0-15 -- PKTGEN_CONFIG
+// cp PKTGEN_CONFIG /home/hamid/temp
+$GEN_GDB ${GEN_CLICK_DIR}click --dpdk -l 0-15 -- PKTGEN_CONFIG
 // click --dpdk -l 0-15 -- /home/hamid/temp
 echo "EVENT TX_FINISHED"
 echo "Generator stopped..."
