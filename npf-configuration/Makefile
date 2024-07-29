@@ -4,13 +4,13 @@ NPF_CLUSTER?=nf=nslrack35 client=nslrack16,nic=1 tofino32=tofino32
 OUTPUT_COLUMNS?=--output-columns x min perc1 perc20 median perc80 perc99 max avg --no-graph-time
 
 NPF_DIR?=/home/conext/npf/build/lib/
-FAJITA_CLICK_DIR?=/home/hamid/workspace/fajita-artifact/FAJITA/
-FASTCLICK_CLICK_DIR?=/home/hamid/workspace/fajita-artifact/fastclick/
-VPP_INSTALL_DIR?=/home/hamid/workspace/fajita-artifact/custom-vpp/
-SOLVER_DIR?=/home/hamid/workspace/prefetch/repo/dyssect/
-DYSSECT_DIR?=/home/hamid/workspace/prefetch/repo/dyssect/
+FAJITA_CLICK_DIR?=/home/conext/FAJITA/
+FASTCLICK_CLICK_DIR?=/home/conext/fastclick/
+VPP_INSTALL_DIR?=/home/conext/custom-vpp/
+SOLVER_DIR?=/home/conext/FAJITA-experiments/extra-elements/dyssect/
+DYSSECT_DIR?=/home/conext/dyssect/
 
-GEN_CLICK_DIR?=/home/hamid/workspace/prefetch/repo/fastclick-gen2/fastclick/bin/
+GEN_CLICK_DIR?=/home/conext/generator/fastclick/bin/
 
 MAIN_DIR := $(dir $(CURDIR:%/=%))
 
@@ -37,7 +37,7 @@ various_offered_load:
 		--graph-size 5 2.5 \
 		--force-retest \
 		--tags promisc two ratevar \
-		--variables FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR} NF_CPU=${CORES}
+		--variables FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR} GEN_CLICK_DIR=${GEN_CLICK_DIR} NF_CPU=${CORES} 
 
 various_packet_size:
 		${NPF_DIR}npf_compare.py \
@@ -54,7 +54,7 @@ various_packet_size:
 		--graph-size 5 2.5 \
 		--force-retest \
 		--tags promisc three synthetic gen_nolat pktsizevar \
-		--variables NF_CPU=4 MAXLENGTH=1500 GEN_RATE=12000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR}
+		--variables NF_CPU=4 MAXLENGTH=1500 GEN_RATE=12000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR} GEN_CLICK_DIR=${GEN_CLICK_DIR}
 
 scalability-1NF:
 		${NPF_DIR}npf_compare.py \
@@ -71,7 +71,7 @@ scalability-1NF:
 		--graph-size 5 2.5 \
 		--force-retest \
 		--tags promisc one gen_nolat coresvar \
-		--variables GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR}
+		--variables GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR} GEN_CLICK_DIR=${GEN_CLICK_DIR}
 
 scalability-2NFs:
 		${NPF_DIR}npf_compare.py \
@@ -88,7 +88,7 @@ scalability-2NFs:
 		--graph-size 5 2.5 \
 		--force-retest \
 		--tags promisc two gen_nolat coresvar \
-		--variables GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR}
+		--variables GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR} GEN_CLICK_DIR=${GEN_CLICK_DIR}
 
 scalability-3NFs:
 		${NPF_DIR}npf_compare.py \
@@ -105,7 +105,7 @@ scalability-3NFs:
 		--graph-size 5 2.5 \
 		--force-retest \
 		--tags promisc three gen_nolat coresvar \
-		--variables GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR}
+		--variables GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR} GEN_CLICK_DIR=${GEN_CLICK_DIR}
 
 workload-var:
 		${NPF_DIR}npf_compare.py \
@@ -125,7 +125,7 @@ workload-var:
 		--graph-size 8 2.5 \
 		--force-retest \
 		--tags promisc three gen_nolat \
-		--variables NF_CPU=8 GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR}
+		--variables NF_CPU=8 GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR} GEN_CLICK_DIR=${GEN_CLICK_DIR}
 
 statefulness-impact:
 		${NPF_DIR}npf_compare.py \
@@ -141,7 +141,7 @@ statefulness-impact:
 		--graph-size 5 2.5 \
 		--force-retest \
 		--tags promisc one synthetic perf gen_nolat flowsvar\
-		--variables NF_CPU=8 GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR}
+		--variables NF_CPU=8 GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR} GEN_CLICK_DIR=${GEN_CLICK_DIR}
 
 auxiliary-ht:
 		${NPF_DIR}npf_compare.py \
@@ -159,7 +159,7 @@ auxiliary-ht:
 		--graph-size 5 2.5 \
 		--force-retest \
 		--tags promisc share synthetic gen_nolat coresvar \
-		--variables GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR}
+		--variables GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR} GEN_CLICK_DIR=${GEN_CLICK_DIR}
 
 dyssect-compare:
 		${NPF_DIR}npf_compare.py \
@@ -176,7 +176,7 @@ dyssect-compare:
 		--graph-size 5 2.5 \
 		--force-retest \
 		--tags promisc timing coresvar \
-		--variables GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR} SOLVER_DIR=${SOLVER_DIR} DYSSECT_DIR=${DYSSECT_DIR}
+		--variables GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR} SOLVER_DIR=${SOLVER_DIR} DYSSECT_DIR=${DYSSECT_DIR} GEN_CLICK_DIR=${GEN_CLICK_DIR}
 
 imbalance-impact:
 		${NPF_DIR}npf_compare.py \
@@ -192,4 +192,4 @@ imbalance-impact:
 		--graph-size 5 2.5 \
 		--force-retest \
 		--tags promisc synthetic \
-		--variables GEN_THREADS=4 NF_CPU=8 GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR} SOLVER_DIR=${SOLVER_DIR} DYSSECT_DIR=${DYSSECT_DIR}
+		--variables GEN_THREADS=4 NF_CPU=8 GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR} SOLVER_DIR=${SOLVER_DIR} DYSSECT_DIR=${DYSSECT_DIR} GEN_CLICK_DIR=${GEN_CLICK_DIR}
