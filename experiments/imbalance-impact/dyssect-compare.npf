@@ -74,8 +74,8 @@ RECIRCULATE=0
 
 //........ NF CONFIGURATION ........\\
 
-NF_CLICK_DIR=/home/hamid/workspace/prefetch/repo/rack35/fajita/fastclick/
-freshfc:NF_CLICK_DIR=/home/hamid/workspace/prefetch/repo/rack35/fastclick/
+FAJITA_CLICK_DIR=/home/hamid/workspace/prefetch/repo/rack35/fajita/fastclick/
+FASTCLICK_CLICK_DIR=/home/hamid/workspace/prefetch/repo/rack35/fastclick/
 VPP_INSTALL_DIR=/home/hamid/workspace/prefetch/repo/vpp-customized/vpp/
 
 NF_CPU=8
@@ -94,6 +94,9 @@ SCALE=SHARE
 %late_variables
 VPP_MAX_CORE=EXPAND($(( (min(15,$NF_CPU) ) )))
 CAPA=EXPAND($(( int( $NF_CPU * 16000000 ) if $NF_CPU < 5 else 120000000 )))
+
+-freshfc:NF_CLICK_DIR=EXPAND( $FAJITA_CLICK_DIR )
+freshfc:NF_CLICK_DIR=EXPAND( $FASTCLICK_CLICK_DIR )
 
 %synthetic:late_variables
 trace=EXPAND(/mnt/traces/synthetic/flow-prefetch-${FLOWS}.pcap)
