@@ -31,12 +31,16 @@ We use NPF to run experiments with different setups and store results in csv fil
 You can install [NPF][NPF] via the following command:
 
 ```bash
-python3 -m pip install --user npf
+git clone https://github.com/tbarbette/npf.git npf
+cd npf
+python3 setup.py build
+chmod u+x ./build/lib/npf_compare.py
 ```
 
-**Do not forget to add `export PATH=$PATH:~/.local/bin` to `~/.bashrc` or `~/.zshrc`. Otherwise, you cannot run `npf-compare` and `npf-run` commands.** 
+NPF will look for `cluster/` in your current working/testie directory. We have included sample `cluster` templates, available at `npf-configuration/cluster`. Please ensure that you add proper node file in the provided directory. For more information about how to setup your cluster please check the [NPF guidelines][NPF-cluster].
 
-NPF will look for `cluster/` and `repo/` in your current working/testie directory. We have included the required `repo` for our experiments and a sample `cluster` template, available at `experiment/`. For more information about how to setup your cluster please check the [NPF guidelines][NPF-cluster].
+
+Additionally, the provided script needs to have the NPF sudo access and shared directories enabled. Please configure your testbed according to the [NPF run time dependencies][NPF-cluster].
 
 ### Data Plane Development Kit (DPDK)
 We use DPDK to bypass kernel network stack in order to achieve line rate in our tests. To build DPDK, you can run the following commands:
@@ -44,8 +48,11 @@ We use DPDK to bypass kernel network stack in order to achieve line rate in our 
 ```
 git clone https://github.com/DPDK/dpdk.git
 cd dpdk
-git checkout v20.02
-make install T=x86_64-native-linux-gcc
+git checkout v22.07
+mkdir build
+cd build
+meson --prefix $(pwd)/../install .. .
+ninja install -j 8
 ```
 In case you want to use a newer (or different) version of DPDK, please check [DPDK documentation][dpdk-doc].
 
@@ -68,8 +75,7 @@ After building DPDK, you can run the following commands to download and build FA
 
 ```
 git clone https://github.com/hamidgh09/fastclick.git
-cd fastclick
-git checkout fajita
+cd FAJITA
 
 PKG_CONFIG_PATH={YOUR_DPDK_INSTALL_DIR}/lib/x86_64-linux-gnu/pkgconfig ./configure --enable-dpdk --enable-intel-cpu --verbose --enable-select=poll "CFLAGS=-O3" "CXXFLAGS=-std=c++17 -O3" --disable-dynamic-linking --enable-poll --enable-bound-port-transfer --enable-local --disable-task-stats --enable-cpu-load --enable-dpdk-packet --disable-clone --disable-dpdk-softqueue --enable-research --disable-sloppy --enable-user-timestamp --enable-flow
 
@@ -81,10 +87,39 @@ So far, your testbed is ready for running experiments only for FAJITA. To build 
 
 ### FastClick
 
+```
+git clone https://github.com/tbarbette/fastclick.git
+cd fastclick
+PKG_CONFIG_PATH={YOUR_DPDK_INSTALL_DIR}/lib/x86_64-linux-gnu/pkgconfig ./configure --enable-dpdk --enable-intel-cpu --verbose --enable-select=poll "CFLAGS=-O3" "CXXFLAGS=-std=c++17 -O3" --disable-dynamic-linking --enable-poll --enable-bound-port-transfer --enable-local --disable-task-stats --enable-cpu-load --enable-dpdk-packet --disable-clone --disable-dpdk-softqueue --enable-research --disable-sloppy --enable-user-timestamp --enable-flow
+
+make clean
+make -j 8
+```
+
 ### VPP
 
-### Dyssect
+```
+git clone https://github.com/FAJITA-Packet-Processing-Framework/custom-vpp.git
+cd custom-vpp
+sudo make build-release
+sudo make build-release
+```
 
+### Dyssect
+```
+git clone https://github.com/tbarbette/fastclick.git dyssect
+cd dyssect
+cp {FAJITA-EXPERIMETNS-DIR}/extra-elements/dyssect/solver* .
+cp {FAJITA-EXPERIMETNS-DIR}/extra-elements/dyssect/elements/* elements/research/ 
+
+PKG_CONFIG_PATH={YOUR_DPDK_INSTALL_DIR}/lib/x86_64-linux-gnu/pkgconfig ./configure --enable-dpdk --enable-intel-cpu --verbose --enable-select=poll "CFLAGS=-O3" "CXXFLAGS=-std=c++17 -O3" --disable-dynamic-linking --enable-poll --enable-bound-port-transfer --enable-local --disable-task-stats --enable-cpu-load --enable-dpdk-packet --disable-clone --disable-dpdk-softqueue --enable-research --disable-sloppy --enable-user-timestamp
+
+make clean 
+make -j 8
+```
+
+### Updating the Makefile
+We already provided a Makefile in `npf-configuration` directory that allows you to run reported experiments in the paper. Please ensure that after installing frameworks and dependencies you update this Makefile with the correct cluster configuration and frameworks directory in lines 3-14 of the Makefile.
 
 ## Citing our paper
 If you use FAJITA, please cite our paper:
@@ -118,4 +153,6 @@ If you have any question regarding the code or the paper you can contact me (ham
 [Dyssect]: https://google.com
 [VPP]: https://github.com/FDio/vpp
 [tofino-multicast]: https://google.com
-[NPF-cluster]: https://github.com/tbarbette/npf/blob/master/cluster/README.md
+[NPF-cluster]: https://npf.readthedocs.io/en/latest/cluster.html
+[NPF-setup]: https://npf.readthedocs.io/en/latest/usage.html#run-time-dependencies
+[dpdk-doc]: https://doc.dpdk.org/guides/linux_gsg/index.html
