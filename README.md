@@ -14,7 +14,16 @@ This repository contains instructions for using FAJITA and running experiments t
 
 **NOTE: Before running the experiments, you need to prepare your testbed according to the following guidelines.**
 
-To reproduce results demonstrated in our [paper][fajita-paper] you need to have a two commidity servers that are connected through a switch. One server acts as a Traffic Generator (TG) and the other is the Device Under Test (DUT) which runs the chain of stateful NFs. 
+To reproduce results demonstrated in our [paper][fajita-paper] you need to have a two commidity servers that are connected through a Tofino switch. One server acts as a Traffic Generator (TG) and the other is the Device Under Test (DUT) which runs the chain of stateful NFs. 
+
+Note that we use an extra forwarder switch in our testbed to support a 200G to the DUT. However it is not required and nor affect the provided scripts if your Tofino switch already supports 200G or you run the experiment on a 100G link. 
+
+<p align="center">
+<br>
+<img src="fajita-testbed.png" alt="Reframer working diagram" width="65%"/>
+<br>
+</p>
+
 
 Since the generated rate on the TG is limited and normally can not go beyond 20Mpps (depending on your hardware setup), we create multiple clones of packets on the switch. You can read more about it in our [paper][fajita-paper]. Also, a proper code compatible with Tofino2 switches for generating clones is available on our [Multicast][tofino-multicast] respository.
 
@@ -117,6 +126,43 @@ PKG_CONFIG_PATH={YOUR_DPDK_INSTALL_DIR}/lib/x86_64-linux-gnu/pkgconfig ./configu
 make clean 
 make -j 8
 ```
+Note that you also need a a valid [Gurobi][gurobi] optimization account. for running Dyssect with the runtime load-balancer.
+
+### Traffic Generator
+
+To run the experiments you need to have a traffic generator on a separate server as explained above. The generator uses FastClick and either replays multiple CAIDA trace windows or uses a run-time synthetic traffic generator. To install the traffic generator you can use the following commands on the generator server:
+
+```
+mkdir generator
+cd generator
+
+echo "Building DPDK v22.07..."
+git clone https://github.com/DPDK/dpdk.git
+cd dpdk
+git checkout v22.07
+mkdir build
+cd build
+meson --prefix $(pwd)/../install .. .
+ninja install -j 8
+cd ../..
+
+export RTE_TARGET="x86_64-native-linuxapp-gcc"
+export RTE_SDK="$(pwd)/dpdk/"
+
+echo "RTE_SDK=$RTE_SDK"
+echo "DPDK v22.07 build done, make sure no errors are popped up..." 
+
+echo "Building FastClick..."
+git clone https://github.com/tbarbette/fastclick.git
+cd fastclick
+cp ../../FAJITA-experiments/extra-elements/generator/* elements/tcpudp/
+
+PKG_CONFIG_PATH=${PWD%/*}/dpdk/install/lib/x86_64-linux-gnu/pkgconfig ./configure --enable-dpdk --enable-intel-cpu --verbose --enable-select=poll "CFLAGS=-O3" "CXXFLAGS=-std=c++17 -O3" --disable-dynamic-linking --enable-poll --enable-bound-port-transfer --enable-local --disable-task-stats --enable-cpu-load --enable-dpdk-packet --disable-clone --disable-dpdk-softqueue --enable-research --disable-sloppy --enable-user-timestamp --enable-flow
+
+make clean
+make -j 16
+```
+Additionally you can use instructions provided in [RSS++ artifact source code][rss++] to generate the parrallel windows of CAIDA trace files.
 
 ### Updating the Makefile
 We already provided a Makefile in `npf-configuration` directory that allows you to run reported experiments in the paper. Please ensure that after installing frameworks and dependencies you update this Makefile with the correct cluster configuration and frameworks directory in lines 3-14 of the Makefile.
@@ -156,3 +202,5 @@ If you have any question regarding the code or the paper you can contact me (ham
 [NPF-cluster]: https://npf.readthedocs.io/en/latest/cluster.html
 [NPF-setup]: https://npf.readthedocs.io/en/latest/usage.html#run-time-dependencies
 [dpdk-doc]: https://doc.dpdk.org/guides/linux_gsg/index.html
+[gurobi]: https://www.gurobi.com/
+[rss++]: https://github.com/rsspp/experiments/tree/master/traces
