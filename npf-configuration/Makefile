@@ -7,13 +7,19 @@ NPF_DIR?=/home/conext/npf/build/lib/
 FAJITA_CLICK_DIR?=/home/conext/FAJITA/
 FASTCLICK_CLICK_DIR?=/home/conext/fastclick/
 VPP_INSTALL_DIR?=/home/conext/custom-vpp/
-SOLVER_DIR?=/home/conext/FAJITA-experiments/extra-elements/dyssect/
+SOLVER_DIR?=/home/conext/dyssect/
 DYSSECT_DIR?=/home/conext/dyssect/
 GUROBI_BASE_DIR?=/home/conext/gurobi1103/linux64
 
 GEN_CLICK_DIR?=/home/conext/generator/fastclick/bin/
 
 MAIN_DIR := $(dir $(CURDIR:%/=%))
+
+SYNTHETIC?=0
+SYNTH :=
+ifeq ($(SYNTHETIC), 1)
+SYNTH := synthetic
+endif
 
 CORES?=8
 N_RUNS?=1
@@ -71,7 +77,7 @@ scalability-1NF:
 		--config n_runs=${N_RUNS} \
 		--graph-size 5 2.5 \
 		--force-retest \
-		--tags promisc one gen_nolat coresvar \
+		--tags promisc one gen_nolat coresvar ${SYNTH} \
 		--variables GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR} GEN_CLICK_DIR=${GEN_CLICK_DIR}
 
 scalability-2NFs:
@@ -88,7 +94,7 @@ scalability-2NFs:
 		--config n_runs=${N_RUNS} \
 		--graph-size 5 2.5 \
 		--force-retest \
-		--tags promisc two gen_nolat coresvar \
+		--tags promisc two gen_nolat coresvar ${SYNTH} \
 		--variables GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR} GEN_CLICK_DIR=${GEN_CLICK_DIR}
 
 scalability-3NFs:
@@ -105,7 +111,7 @@ scalability-3NFs:
 		--config n_runs=${N_RUNS} \
 		--graph-size 5 2.5 \
 		--force-retest \
-		--tags promisc three gen_nolat coresvar \
+		--tags promisc three gen_nolat coresvar ${SYNTH} \
 		--variables GEN_RATE=25000000 FAJITA_CLICK_DIR=${FAJITA_CLICK_DIR} FASTCLICK_CLICK_DIR=${FASTCLICK_CLICK_DIR} VPP_INSTALL_DIR=${VPP_INSTALL_DIR} GEN_CLICK_DIR=${GEN_CLICK_DIR}
 
 workload-var:
