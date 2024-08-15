@@ -59,10 +59,14 @@ git clone https://github.com/tbarbette/fastclick.git dyssect
 cd dyssect
 cp ../FAJITA-experiments/extra-elements/dyssect/solver* .
 cp ../FAJITA-experiments/extra-elements/dyssect/elements/* elements/research/
+
 PKG_CONFIG_PATH=${PWD%/*}/dpdk/install/lib/x86_64-linux-gnu/pkgconfig ./configure --enable-dpdk --enable-intel-cpu --verbose --enable-select=poll "CFLAGS=-O3" "CXXFLAGS=-std=c++17 -O3" --disable-dynamic-linking --enable-poll --enable-bound-port-transfer --enable-local --disable-task-stats --enable-cpu-load --enable-dpdk-packet --disable-clone --disable-dpdk-softqueue --enable-research --disable-sloppy --enable-user-timestamp
 make clean 
 PKG_CONFIG_PATH=${PWD%/*}/dpdk/install/lib/x86_64-linux-gnu/pkgconfig ./configure --enable-dpdk --enable-intel-cpu --verbose --enable-select=poll "CFLAGS=-O3" "CXXFLAGS=-std=c++17 -O3" --disable-dynamic-linking --enable-poll --enable-bound-port-transfer --enable-local --disable-task-stats --enable-cpu-load --enable-dpdk-packet --disable-clone --disable-dpdk-softqueue --enable-research --disable-sloppy --enable-user-timestamp
 make -j 16
 echo "Dyssect Build done..."
+
+echo "Installing perf dependencies..."
+sudo apt install linux-tools-common linux-tools-generic linux-tools-`uname -r`
 
 echo "All systems are ready! You can now run the experiments if no error has popped up during the setup..."
